@@ -2,6 +2,28 @@
     padding-bottom: 80px;
 }
 
+.attendance-header {
+    margin-bottom: 32px;
+}
+
+.ai-attendance-insight {
+    margin-top: 12px;
+    background: rgba(239, 68, 68, 0.1);
+    /* Red tint for risk context */
+    border-left: 3px solid var(--accent-red);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ai-attendance-insight .ai-label {
+    color: var(--accent-red);
+}
+
 .page-header {
     margin-bottom: 32px;
 }
@@ -174,6 +196,27 @@
     font-size: 0.85rem;
     margin-bottom: 4px;
     color: var(--text-secondary);
+}
+
+.ai-dashboard-insight {
+    margin-top: 12px;
+    background: rgba(59, 130, 246, 0.1);
+    border-left: 3px solid var(--accent-blue);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ai-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--accent-blue);
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 .tooltip-item span:last-child {
@@ -350,4 +393,11 @@
     color: var(--text-secondary);
     padding: 20px;
     font-style: italic;
+}
+
+/* Classic small icon */
+.icon-small {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    vertical-align: middle;
 }

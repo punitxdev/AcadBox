@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAcademic } from '../context/AcademicContext';
-import { FaDownload, FaTrashAlt } from 'react-icons/fa';
+import { FaDownload, FaTrashAlt, FaDatabase } from 'react-icons/fa';
+import { MOCK_DATA } from '../utils/mockData';
 import './Settings.css';
 
 const Settings = () => {
@@ -29,6 +30,20 @@ const Settings = () => {
         if (window.confirm('Are you sure you want to reset all data? This action cannot be undone.')) {
             deleteAllSemesters();
             alert('All data has been reset.');
+        }
+    };
+
+    const handleLoadDemoData = () => {
+        if (window.confirm('This will OVERWRITE your current data with demo data. Continue?')) {
+            localStorage.setItem('acadbox_courses', JSON.stringify(MOCK_DATA.courses));
+            localStorage.setItem('acadbox_tasks', JSON.stringify(MOCK_DATA.tasks));
+            localStorage.setItem('acadbox_attendance', JSON.stringify(MOCK_DATA.attendance));
+            localStorage.setItem('acadbox_grades', JSON.stringify(MOCK_DATA.grades));
+            localStorage.setItem('acadbox_focusSessions', JSON.stringify(MOCK_DATA.focusSessions));
+            localStorage.setItem('acadbox_streak', JSON.stringify(MOCK_DATA.streak));
+            localStorage.setItem('acadbox_currentSemester', JSON.stringify(MOCK_DATA.currentSemester));
+            localStorage.setItem('acadbox_semesters', JSON.stringify(MOCK_DATA.semesters));
+            window.location.reload();
         }
     };
 
@@ -105,6 +120,15 @@ const Settings = () => {
                         </div>
                         <button className="btn btn-primary" onClick={handleExport}>
                             <FaDownload /> Export
+                        </button>
+                    </div>
+                    <div className="setting-item">
+                        <div className="setting-info">
+                            <label>Load Demo Data</label>
+                            <p>Populate app with test data for AI verification</p>
+                        </div>
+                        <button className="btn btn-secondary" onClick={handleLoadDemoData}>
+                            <FaDatabase /> Load Demo
                         </button>
                     </div>
                     <div className="setting-item">

@@ -1,13 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAcademic } from '../context/AcademicContext';
 import { FaCheckCircle, FaExclamationTriangle, FaTimesCircle, FaChartLine, FaPlus, FaMinus, FaInfoCircle } from 'react-icons/fa';
 import './Attendance.css';
 
 const Attendance = () => {
-    const { currentSemester, getSemesterCourses, attendance, updateAttendance, getAttendanceStatus, getAttendanceInsights } = useAcademic();
+    const { currentSemester, getSemesterCourses, attendance, updateAttendance, getAttendanceStatus, getAttendanceInsights, fetchAIInsight } = useAcademic();
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [tempAttendance, setTempAttendance] = useState({ attended: 0, total: 0 });
+    const [attendanceInsight, setAttendanceInsight] = useState("Analyzing attendance risk...");
+
+    const overallStatus = getAttendanceStatus(); // Assuming getAttendanceStatus() without args provides overall status
+    // const insights = getAttendanceInsights(); // This line from the instruction seems to be for a global insight, but the component already uses per-course insights. Keeping it commented out to avoid conflict unless explicitly needed for a global display.
+
+    useEffect(() => {
+        const getInsight = async () => {
+            if (fetchAIInsight && overallStatus) { // Ensure fetchAIInsight and overallStatus are available
+                const insight = await fetchAIInsight('attendance-risk', {
+                    percentage: overallStatus.percentage,
+                    safeThreshold: 75 // Assuming 75% is the threshold
+                });
+                if (insight) setAttendanceInsight(insight);
+            }
+        };
+        getInsight();
+    }, [overallStatus?.percentage, fetchAIInsight]); // Depend on overallStatus.percentage and fetchAIInsight
 
     const semesterCourses = getSemesterCourses(currentSemester);
 
@@ -26,9 +43,13 @@ const Attendance = () => {
     return (
         <div className="attendance-page-v5">
             <header className="v5-header">
-                <div className="v5-header-content">
-                    <h1>Attendance Risk Monitor</h1>
-                    <p className="v5-subtitle">Monitor class presence and predictive risk levels</p>
+                <div className="attendance-header">
+                    <h1>Attendance Monitor</h1>
+                    <p className="subtitle">Track your presence. Protect your eligibility.</p>
+                    <div className="ai-attendance-insight">
+                        <span className="ai-label">AI RISK ASSESSMENT</span>
+                        {attendanceInsight}
+                    </div>
                 </div>
                 <div className="v5-header-actions">
                     <span className="v5-semester-badge">{currentSemester}</span>

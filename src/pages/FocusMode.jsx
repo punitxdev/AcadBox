@@ -6,7 +6,7 @@ import SessionAutopsy from '../components/SessionAutopsy';
 import './FocusMode.css';
 
 const FocusMode = () => {
-    const { tasks, activeSession, startSession, breakSession } = useAcademic();
+    const { tasks, activeSession, startSession, breakSession, aiPrioritizedTasks, isAiLoading } = useAcademic();
     const [selectedTask, setSelectedTask] = useState(null);
     const [duration, setDuration] = useState(25);
     const [timeLeft, setTimeLeft] = useState(0);
@@ -32,6 +32,8 @@ const FocusMode = () => {
             if (activeSession.sessionGoal) setSessionGoal(activeSession.sessionGoal);
         }
     }, [activeSession, tasks]);
+
+    // Removed local AI fetching useEffect - using aiPrioritizedTasks from context
 
     // Timer Logic
     useEffect(() => {
@@ -207,17 +209,35 @@ const FocusMode = () => {
                 <div className="setup-step">
                     <label>1. Select Task (Mandatory)</label>
                     <div className="task-selection-grid">
-                        {pendingTasks.map(task => (
-                            <div
-                                key={task.id}
-                                className={`task-option ${selectedTask?.id === task.id ? 'selected' : ''}`}
-                                onClick={() => setSelectedTask(task)}
-                            >
-                                <span className="task-title">{task.title}</span>
-                                <span className="task-meta">{task.effort}h • {task.type}</span>
+                        {isAiLoading ? (
+                            <div className="ai-thinking-mini" style={{ gridColumn: '1 / -1', padding: '20px', textAlign: 'center' }}>
+                                <div className="ai-pulse-ring" style={{ width: '40px', height: '40px', margin: '0 auto 10px' }}></div>
+                                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>AI is prioritizing your tasks...</p>
                             </div>
-                        ))}
-                        {pendingTasks.length === 0 && <p className="no-tasks">No pending tasks!</p>}
+                        ) : (
+                            <>
+                                {aiPrioritizedTasks.map(task => (
+                                    <div
+                                        key={task.id}
+                                        className={`task-option ${selectedTask?.id === task.id ? 'selected' : ''}`}
+                                        onClick={() => setSelectedTask(task)}
+                                    >
+                                        <div className="task-content-wrapper">
+                                            <span className="task-title">{task.title}</span>
+                                            {task.ai_priority_label && (
+                                                <span className={`priority-badge ${task.ai_priority_label.toLowerCase()}`}>
+                                                    {task.ai_priority_label}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="task-meta-wrapper">
+                                            <span className="task-meta">{task.effort}h • {task.type}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                                {aiPrioritizedTasks.length === 0 && <p className="no-tasks">No pending tasks!</p>}
+                            </>
+                        )}
                     </div>
                 </div>
 

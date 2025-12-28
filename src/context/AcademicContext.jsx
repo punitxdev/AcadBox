@@ -168,6 +168,16 @@ export const AcademicProvider = ({ children }) => {
         setTasks(tasks.map(t => t.id === taskId ? { ...t, status: 'completed' } : t));
     };
 
+    // New helper to delete a task
+    const deleteTask = (taskId) => {
+        setTasks(tasks.filter(t => t.id !== taskId));
+    };
+
+    // New helper to edit a task (simple shallow merge)
+    const editTask = (taskId, updates) => {
+        setTasks(tasks.map(t => t.id === taskId ? { ...t, ...updates } : t));
+    };
+
     const addCourse = (course) => {
         setCourses([...courses, { ...course, id: Date.now(), semester: currentSemester }]);
     };
@@ -538,16 +548,85 @@ export const AcademicProvider = ({ children }) => {
         autoRescheduleTasks();
     }, []);
 
+    const [aiInsights, setAiInsights] = useState({});
+    const [aiPrioritizedTasks, setAiPrioritizedTasks] = useState([]);
+    const [isAiLoading, setIsAiLoading] = useState(false);
+
+    const fetchAIInsight = async (endpoint, data) => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/ai/${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            return result.insight;
+        } catch (error) {
+            console.error("AI Service Error:", error);
+            return null;
+        }
+    };
+
+    // Centralized AI Task Prioritization with Debouncing
+    useEffect(() => {
+        const updateTaskPriorities = async () => {
+            const pending = tasks.filter(t => t.status === 'pending');
+            if (pending.length === 0) {
+                setAiPrioritizedTasks([]);
+                return;
+            }
+
+            setIsAiLoading(true);
+            try {
+                // Enrich tasks with course credits for the AI model
+                const tasksWithCredits = pending.map(t => {
+                    const course = courses.find(c => c.id === t.courseId);
+                    return {
+                        ...t,
+                        days_left: Math.ceil((new Date(t.deadline) - new Date()) / (1000 * 60 * 60 * 24)),
+                        task_type: t.type === 'Exam' ? 2 : (t.type === 'Project' ? 4 : 1),
+                        effort_hours: t.effort,
+                        course_credit: course ? course.credits : 3,
+                        attendance_risk: 0,
+                        consistency: 0.5,
+                        overdue_count: 0
+                    };
+                });
+
+                const result = await fetchAIInsight('prioritize-tasks', { tasks: tasksWithCredits });
+                if (result && result.sortedTasks) {
+                    setAiPrioritizedTasks(result.sortedTasks);
+                } else {
+                    setAiPrioritizedTasks(pending); // Fallback
+                }
+            } catch (error) {
+                console.error("Failed to prioritize tasks:", error);
+                setAiPrioritizedTasks(pending);
+            } finally {
+                setIsAiLoading(false);
+            }
+        };
+
+        // Debounce: Wait 1 second after last task change before calling AI
+        const timer = setTimeout(() => {
+            updateTaskPriorities();
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, [tasks, courses]);
+
     return (
         <AcademicContext.Provider value={{
             courses, tasks, schedule, settings, grades, semesters, currentSemester, focusSessions, attendance,
-            addTask, completeTask, addCourse, deleteCourse, updateSettings,
+            addTask, completeTask, deleteTask, editTask, addCourse, deleteCourse, updateSettings,
             addGrade, deleteGrade, updateGrade, getCourseGrades, addSemester, getSemesterCourses, setCurrentSemester,
             setCourses, setSemesters, updateSemester, deleteSemester, deleteAllSemesters, addFocusSession,
             getPriorityExplanation, getAcademicHealthBreakdown, getWeakSubjectInsight,
             getEffortAccuracyInsight, getWeeklyReflection, getConfidenceIndicator,
             updateAttendance, getAttendanceStatus, getAttendanceInsights, getPerformanceColor,
-            activeSession, startSession, breakSession, endSession, streak
+            activeSession, startSession, breakSession, endSession, streak,
+            fetchAIInsight, aiInsights, setAiInsights,
+            aiPrioritizedTasks, isAiLoading
         }}>
             {children}
         </AcademicContext.Provider>

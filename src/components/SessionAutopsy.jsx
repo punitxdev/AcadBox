@@ -1,11 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAcademic } from '../context/AcademicContext';
 import { FaCheckCircle, FaExclamationTriangle, FaTimesCircle } from 'react-icons/fa';
 
 const SessionAutopsy = ({ session, onComplete }) => {
-    const { endSession } = useAcademic();
+    const { endSession, fetchAIInsight } = useAcademic();
     const [taskStatus, setTaskStatus] = useState('completed');
     const [actualDuration] = useState(Math.round(session.duration / 60));
+    const [aiInsight, setAiInsight] = useState("Analyzing session data...");
+
+    useEffect(() => {
+        const getInsight = async () => {
+            const insight = await fetchAIInsight('focus-analysis', {
+                plannedDuration: session.duration / 60,
+                actualDuration: actualDuration,
+                status: session.status,
+                exitReason: session.breakReason,
+                taskTitle: session.taskTitle // Assuming taskTitle is available or fetched
+            });
+            if (insight) setAiInsight(insight);
+        };
+        getInsight();
+    }, []);
 
     const handleFinish = () => {
         endSession(actualDuration, taskStatus);
@@ -64,9 +79,8 @@ const SessionAutopsy = ({ session, onComplete }) => {
                     </div>
 
                     <div className="autopsy-feedback">
-                        {focusScore < 50 && <p>Long time, low output → task might be too large.</p>}
-                        {focusScore >= 90 && <p>High focus! Consider increasing duration next time.</p>}
-                        {taskStatus === 'failed' && <p>Don't worry. Break the task down and try again.</p>}
+                        <div className="ai-badge">AI ANALYSIS</div>
+                        <p>{aiInsight}</p>
                     </div>
                 </div>
 
@@ -128,12 +142,26 @@ const SessionAutopsy = ({ session, onComplete }) => {
                 
                 .autopsy-feedback {
                     margin-top: 24px;
-                    padding: 16px;
-                    background: rgba(59, 130, 246, 0.1);
+                    padding: 20px;
+                    background: rgba(59, 130, 246, 0.05);
+                    border: 1px solid rgba(59, 130, 246, 0.2);
                     border-radius: 12px;
                     color: var(--text-primary);
                     text-align: center;
-                    font-style: italic;
+                    position: relative;
+                }
+                .ai-badge {
+                    position: absolute;
+                    top: -10px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: var(--accent-blue);
+                    color: white;
+                    font-size: 0.7rem;
+                    font-weight: 700;
+                    padding: 2px 8px;
+                    border-radius: 4px;
+                    letter-spacing: 1px;
                 }
             `}</style>
         </div>
