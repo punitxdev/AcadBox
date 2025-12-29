@@ -82,6 +82,18 @@ cd python_service
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
+```
+
+### 5. ⚠️ Generate AI Models (Required)
+The pre-trained models are too large for GitHub, so you must generate them locally before running the app.
+
+1.  Navigate to the `aiModels/` directory.
+2.  Open and run all cells in `TaskPriorityModel.ipynb` to generate `acadbox_task_priority_model.pkl`.
+3.  Open and run all cells in `AcademicHealthModel.ipynb` to generate `acadbox_academic_health_model.pkl`.
+4.  Ensure the generated `.pkl` files are in the `aiModels/` directory.
+
+### 6. Run AI Service
+```bash
 python app.py
 ```
 *Runs on `http://localhost:5001`*
