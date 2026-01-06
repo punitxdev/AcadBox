@@ -121,7 +121,7 @@ const FocusMode = () => {
                 <div className="locked-content">
                     <div className="locked-header">
                         <FaLock className="lock-icon" />
-                        <h2>Focus Locked</h2>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: 'var(--text-primary)' }}>Focus Locked</h2>
                     </div>
 
                     <div className="locked-timer">
@@ -129,10 +129,10 @@ const FocusMode = () => {
                     </div>
 
                     <div className="locked-task">
-                        <label>Current Task</label>
-                        <h3>{selectedTask?.title || 'Unknown Task'}</h3>
+                        <label>WORKING ON</label>
+                        <h3>{selectedTask?.title || 'Deep Work Session'}</h3>
                         {activeSession.sessionGoal && (
-                            <p className="session-goal-display">Goal: {activeSession.sessionGoal}</p>
+                            <p className="session-goal-display">"{activeSession.sessionGoal}"</p>
                         )}
                     </div>
 
@@ -143,10 +143,10 @@ const FocusMode = () => {
                             </button>
                         ) : (
                             <div className="emergency-confirm">
-                                <p><FaExclamationTriangle /> Exiting will mark this session as <strong>BROKEN</strong>.</p>
+                                <p><FaExclamationTriangle /> Session will be marked as broken.</p>
                                 <div className="confirm-actions">
-                                    <button className="btn-danger" onClick={handleEmergencyExit}>Confirm Exit</button>
-                                    <button className="btn-ghost" onClick={() => setShowEmergencyExit(false)}>Cancel</button>
+                                    <button className="btn-danger" onClick={handleEmergencyExit}>End Session</button>
+                                    <button className="btn-ghost" onClick={() => setShowEmergencyExit(false)}>Resume</button>
                                 </div>
                             </div>
                         )}
@@ -203,46 +203,53 @@ const FocusMode = () => {
     return (
         <div className="focus-setup-page">
             <div className="setup-card">
-                <h2>Start Focus Session</h2>
-                <p className="setup-subtitle">Commit to ONE task. No distractions.</p>
+                <h2>Focus Session</h2>
+                <p className="setup-subtitle">Eliminate distractions. Deep work starts here.</p>
 
                 <div className="setup-step">
-                    <label>1. Select Task (Mandatory)</label>
+                    <label>1. Select Task</label>
                     <div className="task-selection-grid">
                         {isAiLoading ? (
-                            <div className="ai-thinking-mini" style={{ gridColumn: '1 / -1', padding: '20px', textAlign: 'center' }}>
-                                <div className="ai-pulse-ring" style={{ width: '40px', height: '40px', margin: '0 auto 10px' }}></div>
-                                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>AI is prioritizing your tasks...</p>
+                            <div className="ai-thinking-mini" style={{ padding: '20px', textAlign: 'center' }}>
+                                <div className="ai-pulse-ring" style={{ width: '32px', height: '32px', margin: '0 auto 10px' }}></div>
+                                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>AI is prioritizing...</p>
                             </div>
                         ) : (
                             <>
-                                {aiPrioritizedTasks.map(task => (
-                                    <div
-                                        key={task.id}
-                                        className={`task-option ${selectedTask?.id === task.id ? 'selected' : ''}`}
-                                        onClick={() => setSelectedTask(task)}
-                                    >
-                                        <div className="task-content-wrapper">
-                                            <span className="task-title">{task.title}</span>
-                                            {task.ai_priority_label && (
-                                                <span className={`priority-badge ${task.ai_priority_label.toLowerCase()}`}>
-                                                    {task.ai_priority_label}
-                                                </span>
-                                            )}
+                                {aiPrioritizedTasks
+                                    .sort((a, b) => {
+                                        const priorityOrder = { 'Today': 1, 'Tomorrow': 2, 'Low': 3 };
+                                        const priorityA = priorityOrder[a.ai_priority_label] || 4;
+                                        const priorityB = priorityOrder[b.ai_priority_label] || 4;
+                                        return priorityA - priorityB;
+                                    })
+                                    .map(task => (
+                                        <div
+                                            key={task.id}
+                                            className={`task-option ${selectedTask?.id === task.id ? 'selected' : ''}`}
+                                            onClick={() => setSelectedTask(task)}
+                                        >
+                                            <div className="task-content-wrapper">
+                                                <span className="task-title">{task.title}</span>
+                                                {task.ai_priority_label && (
+                                                    <span className={`priority-badge ${task.ai_priority_label.toLowerCase()}`}>
+                                                        {task.ai_priority_label}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="task-meta-wrapper">
+                                                <span className="task-meta">{task.effort}h • {task.type}</span>
+                                            </div>
                                         </div>
-                                        <div className="task-meta-wrapper">
-                                            <span className="task-meta">{task.effort}h • {task.type}</span>
-                                        </div>
-                                    </div>
-                                ))}
-                                {aiPrioritizedTasks.length === 0 && <p className="no-tasks">No pending tasks!</p>}
+                                    ))}
+                                {aiPrioritizedTasks.length === 0 && <p className="no-tasks" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No pending tasks found.</p>}
                             </>
                         )}
                     </div>
                 </div>
 
                 <div className="setup-step">
-                    <label>2. Select Duration</label>
+                    <label>2. Duration</label>
                     <div className="duration-options">
                         {[25, 45, 90].map(m => (
                             <button
@@ -261,7 +268,7 @@ const FocusMode = () => {
                     disabled={!selectedTask}
                     onClick={handlePreStart}
                 >
-                    <FaPlay /> Start Locked Session
+                    <FaPlay size={14} /> Start Session
                 </button>
             </div>
         </div>

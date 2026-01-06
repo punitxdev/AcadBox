@@ -80,29 +80,34 @@ const Attendance = () => {
                                             {status.label}
                                         </span>
                                     </div>
-                                    <div className="v5-percentage-display">
-                                        <span className="v5-percentage-value" style={{ color: status.color }}>
-                                            {Math.round(status.percentage)}%
-                                        </span>
-                                    </div>
                                 </div>
-
-                                <div className="v5-stats-row">
-                                    <div className="v5-stat-item">
-                                        <span className="v5-stat-label">Attended</span>
-                                        <span className="v5-stat-value">{record.attended}</span>
+                                <div className="v5-card-body">
+                                    <div className="v5-circular-progress-container">
+                                        <div
+                                            className="v5-circular-progress"
+                                            style={{
+                                                background: `conic-gradient(${status.color} ${status.percentage * 3.6}deg, var(--bg-tertiary) ${status.percentage * 3.6}deg)`
+                                            }}
+                                        >
+                                            <div className="v5-circular-inner">
+                                                <span className="v5-circular-value" style={{ color: status.color }}>
+                                                    {Math.round(status.percentage)}%
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="v5-stat-item">
-                                        <span className="v5-stat-label">Total Classes</span>
-                                        <span className="v5-stat-value">{record.total}</span>
-                                    </div>
-                                </div>
 
-                                <div className="v5-progress-bar-bg">
-                                    <div
-                                        className="v5-progress-bar-fill"
-                                        style={{ width: `${status.percentage}%`, backgroundColor: status.color }}
-                                    ></div>
+                                    <div className="v5-stats-column">
+                                        <div className="v5-stat-item">
+                                            <span className="v5-stat-value">{record.attended}</span>
+                                            <span className="v5-stat-label">Attended</span>
+                                        </div>
+                                        <div className="v5-stat-divider"></div>
+                                        <div className="v5-stat-item">
+                                            <span className="v5-stat-value">{record.total}</span>
+                                            <span className="v5-stat-label">Total</span>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {insights && insights.length > 0 && (
@@ -127,56 +132,58 @@ const Attendance = () => {
                 )}
             </div>
 
-            {showUpdateModal && (
-                <div className="v5-modal-overlay" onClick={() => setShowUpdateModal(false)}>
-                    <div className="v5-modal-content" onClick={e => e.stopPropagation()}>
-                        <div className="v5-modal-header">
-                            <h3>Update Attendance</h3>
-                            <p>{selectedCourse?.name}</p>
-                        </div>
-                        <div className="v5-modal-body">
-                            <div className="v5-counter-group">
-                                <label>Classes Attended</label>
-                                <div className="v5-counter">
-                                    <button onClick={() => setTempAttendance(prev => ({ ...prev, attended: Math.max(0, prev.attended - 1) }))}>
-                                        <FaMinus />
-                                    </button>
-                                    <input
-                                        type="number"
-                                        value={tempAttendance.attended}
-                                        onChange={e => setTempAttendance({ ...tempAttendance, attended: e.target.value === '' ? '' : parseInt(e.target.value) })}
-                                        onFocus={e => e.target.select()}
-                                    />
-                                    <button onClick={() => setTempAttendance(prev => ({ ...prev, attended: prev.attended + 1 }))}>
-                                        <FaPlus />
-                                    </button>
+            {
+                showUpdateModal && (
+                    <div className="v5-modal-overlay" onClick={() => setShowUpdateModal(false)}>
+                        <div className="v5-modal-content" onClick={e => e.stopPropagation()}>
+                            <div className="v5-modal-header">
+                                <h3>Update Attendance</h3>
+                                <p>{selectedCourse?.name}</p>
+                            </div>
+                            <div className="v5-modal-body">
+                                <div className="v5-counter-group">
+                                    <label>Classes Attended</label>
+                                    <div className="v5-counter">
+                                        <button onClick={() => setTempAttendance(prev => ({ ...prev, attended: Math.max(0, prev.attended - 1) }))}>
+                                            <FaMinus />
+                                        </button>
+                                        <input
+                                            type="number"
+                                            value={tempAttendance.attended}
+                                            onChange={e => setTempAttendance({ ...tempAttendance, attended: e.target.value === '' ? '' : parseInt(e.target.value) })}
+                                            onFocus={e => e.target.select()}
+                                        />
+                                        <button onClick={() => setTempAttendance(prev => ({ ...prev, attended: prev.attended + 1 }))}>
+                                            <FaPlus />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="v5-counter-group">
+                                    <label>Total Classes</label>
+                                    <div className="v5-counter">
+                                        <button onClick={() => setTempAttendance(prev => ({ ...prev, total: Math.max(prev.attended, prev.total - 1) }))}>
+                                            <FaMinus />
+                                        </button>
+                                        <input
+                                            type="number"
+                                            value={tempAttendance.total}
+                                            onChange={e => setTempAttendance({ ...tempAttendance, total: e.target.value === '' ? '' : parseInt(e.target.value) })}
+                                            onFocus={e => e.target.select()}
+                                        />
+                                        <button onClick={() => setTempAttendance(prev => ({ ...prev, total: prev.total + 1 }))}>
+                                            <FaPlus />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="v5-counter-group">
-                                <label>Total Classes</label>
-                                <div className="v5-counter">
-                                    <button onClick={() => setTempAttendance(prev => ({ ...prev, total: Math.max(prev.attended, prev.total - 1) }))}>
-                                        <FaMinus />
-                                    </button>
-                                    <input
-                                        type="number"
-                                        value={tempAttendance.total}
-                                        onChange={e => setTempAttendance({ ...tempAttendance, total: e.target.value === '' ? '' : parseInt(e.target.value) })}
-                                        onFocus={e => e.target.select()}
-                                    />
-                                    <button onClick={() => setTempAttendance(prev => ({ ...prev, total: prev.total + 1 }))}>
-                                        <FaPlus />
-                                    </button>
-                                </div>
+                            <div className="v5-modal-footer">
+                                <button className="v5-btn-secondary" onClick={() => setShowUpdateModal(false)}>Cancel</button>
+                                <button className="v5-btn-primary" onClick={handleSaveAttendance}>Save Changes</button>
                             </div>
-                        </div>
-                        <div className="v5-modal-footer">
-                            <button className="v5-btn-secondary" onClick={() => setShowUpdateModal(false)}>Cancel</button>
-                            <button className="v5-btn-primary" onClick={handleSaveAttendance}>Save Changes</button>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
         </div>
     );
 };

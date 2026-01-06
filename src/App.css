@@ -9,8 +9,9 @@
   width: calc(100% - 250px);
   padding: 40px;
   min-height: 100vh;
-  background-color: var(--bg-primary);
+  background-color: var(--bg-app);
   box-sizing: border-box;
+  transition: background-color 0.3s ease;
 }
 
 .mobile-header {
@@ -293,7 +294,7 @@
   width: 40px;
   height: 40px;
   border: 3px solid var(--border-color);
-  border-top: 3px solid var(--primary-color);
+  border-top: 3px solid var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;

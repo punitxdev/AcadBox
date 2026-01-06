@@ -59,6 +59,12 @@ app.post('/api/ai/prioritize-tasks', async (req, res) => {
     res.json(result);
 });
 
+// 9. Health Check
+app.get('/api/ai/health', async (req, res) => {
+    const status = await aiService.checkHealth();
+    res.json(status);
+});
+
 app.listen(PORT, () => {
     console.log(`AI Decision Engine running on port ${PORT}`);
 });

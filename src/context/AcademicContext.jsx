@@ -78,6 +78,33 @@ export const AcademicProvider = ({ children }) => {
         return saved ? JSON.parse(saved) : { current: 0, history: [], status: 'solid', lastLogDate: null };
     });
 
+    const [profile, setProfile] = useState(() => {
+        const saved = localStorage.getItem('acadbox_profile');
+        return saved ? JSON.parse(saved) : {
+            fullName: 'Punit',
+            semester: 'Semester 1 2024',
+            branch: 'Computer Science',
+            dailyCapacity: 6,
+            preferredTime: 'Evening',
+            breakStyle: 'Short frequent breaks',
+            riskTolerance: 1,
+            consistency: 0.8,
+            procrastination: 'Low',
+            targetGpa: 9.0,
+            primaryFocus: 'Balanced'
+        };
+    });
+
+    const [calendarEvents, setCalendarEvents] = useState(() => {
+        const saved = localStorage.getItem('acadbox_calendarEvents');
+        return saved ? JSON.parse(saved) : [];
+    });
+
+    const [notes, setNotes] = useState(() => {
+        const saved = localStorage.getItem('acadbox_notes');
+        return saved ? JSON.parse(saved) : [];
+    });
+
     // Save to LocalStorage
     useEffect(() => {
         localStorage.setItem('acadbox_courses', JSON.stringify(courses));
@@ -123,10 +150,50 @@ export const AcademicProvider = ({ children }) => {
         localStorage.setItem('acadbox_streak', JSON.stringify(streak));
     }, [streak]);
 
+    useEffect(() => {
+        localStorage.setItem('acadbox_profile', JSON.stringify(profile));
+    }, [profile]);
+
+    useEffect(() => {
+        localStorage.setItem('acadbox_calendarEvents', JSON.stringify(calendarEvents));
+    }, [calendarEvents]);
+
+    useEffect(() => {
+        localStorage.setItem('acadbox_notes', JSON.stringify(notes));
+    }, [notes]);
+
     const getPerformanceColor = (percentage) => {
         if (percentage >= 80) return 'var(--accent-green)';
         if (percentage >= 60) return '#f59e0b';
         return 'var(--accent-red)';
+    };
+
+    const calculateCurrentGpa = () => {
+        const semesterCourses = courses.filter(c => c.semester === currentSemester);
+        if (semesterCourses.length === 0) return 0;
+
+        let totalWeightedPoints = 0;
+        let totalCredits = 0;
+
+        semesterCourses.forEach(course => {
+            const courseGrades = grades.filter(g => g.courseId === course.id);
+            if (courseGrades.length > 0) {
+                const totalPossible = courseGrades.reduce((sum, g) => sum + g.total, 0);
+                const totalScored = courseGrades.reduce((sum, g) => sum + g.scored, 0);
+
+                // Calculate percentage based on raw scores (simplified for context)
+                // Note: For perfect alignment with Grades.jsx, we should ideally use weightage, 
+                // but raw percentage is a good enough proxy for the "Active" tracker if weightage data is partial.
+                // However, let's stick to raw percentage for robustness in the context.
+                const percentage = totalPossible > 0 ? (totalScored / totalPossible) * 100 : 0;
+                const gradePoint = percentage / 10;
+
+                totalWeightedPoints += (gradePoint * course.credits);
+                totalCredits += course.credits;
+            }
+        });
+
+        return totalCredits > 0 ? (totalWeightedPoints / totalCredits).toFixed(2) : 0;
     };
 
     // "AI" Prioritization Logic
@@ -139,7 +206,36 @@ export const AcademicProvider = ({ children }) => {
         const typeWeight = task.type === 'Exam' ? 2 : 1;
         const effortPenalty = task.effort * 0.5;
 
-        return urgencyScore * typeWeight + effortPenalty;
+        let priority = urgencyScore * typeWeight + effortPenalty;
+
+        // Profile Personalization: Primary Focus
+        if (profile.primaryFocus === 'Exams' && (task.type === 'Exam' || task.type === 'Quiz' || task.type === 'Mid-Sem')) {
+            priority += 5; // Boost exams
+        } else if (profile.primaryFocus === 'Projects' && (task.type === 'Project' || task.type === 'Lab Report' || task.type === 'Assignment')) {
+            priority += 5; // Boost projects
+        }
+
+        // Profile Personalization: Risk Tolerance
+        // Aggressive (2): Care less about deadlines > 3 days away
+        if (profile.riskTolerance === 2 && daysUntil > 3) {
+            priority -= 2;
+        }
+        // Conservative (0): Boost priority for anything due within 5 days
+        if (profile.riskTolerance === 0 && daysUntil <= 5) {
+            priority += 2;
+        }
+
+        // Target GPA Logic: Boost if falling behind
+        const currentGpa = parseFloat(calculateCurrentGpa());
+        const target = profile.targetGpa || 9.0;
+        if (currentGpa > 0 && currentGpa < target) {
+            priority += 2; // General boost to catch up
+            if (currentGpa < target - 1.0) {
+                priority += 2; // Extra boost if significantly behind
+            }
+        }
+
+        return priority;
     };
 
     const schedule = useMemo(() => {
@@ -417,7 +513,12 @@ export const AcademicProvider = ({ children }) => {
             const task = tasks.find(t => t.id === s.taskId);
             return task && semesterCourseIds.includes(task.courseId);
         });
-        const focusConsistency = Math.min(100, semesterSessions.length * 20);
+        let focusConsistency = Math.min(100, semesterSessions.length * 20);
+
+        // Personalize consistency score based on user profile
+        // If user claims high consistency (1.0), we give them a slight boost/benefit of doubt
+        // If user admits low consistency, we rely more on actual data
+        focusConsistency = (focusConsistency * 0.6) + (profile.consistency * 100 * 0.4);
 
         // Grade performance based on grades for current semester
         const semesterGrades = grades.filter(g => semesterCourseIds.includes(g.courseId));
@@ -428,7 +529,7 @@ export const AcademicProvider = ({ children }) => {
         // Attendance performance for current semester
         const semesterAttendance = attendance.filter(a => semesterCourseIds.includes(a.courseId));
         const avgAttendance = semesterAttendance.length > 0
-            ? semesterAttendance.reduce((sum, a) => sum + (a.attended / a.total), 0) / semesterAttendance.length * 100
+            ? semesterAttendance.reduce((sum, a) => sum + (a.total > 0 ? (a.attended / a.total) : 1), 0) / semesterAttendance.length * 100
             : 100;
 
         return {
@@ -439,6 +540,24 @@ export const AcademicProvider = ({ children }) => {
         };
     };
 
+
+
+
+    const getGpaInsight = () => {
+        const currentGpa = parseFloat(calculateCurrentGpa());
+        const target = profile.targetGpa || 9.0;
+        const gap = target - currentGpa;
+
+        if (currentGpa === 0) return { message: "No grades recorded yet.", status: "neutral" };
+
+        if (gap <= 0) {
+            return { message: "Great job! You're on track to meet your GPA goal.", status: "good" };
+        } else if (gap <= 0.5) {
+            return { message: `You're close! Just ${gap.toFixed(1)} points away from your target.`, status: "warning" };
+        } else {
+            return { message: `You're ${gap.toFixed(1)} points behind target. Prioritizing high-value tasks!`, status: "alert" };
+        }
+    };
 
     const getWeakSubjectInsight = () => {
         const semesterCourses = courses.filter(c => c.semester === currentSemester);
@@ -548,6 +667,147 @@ export const AcademicProvider = ({ children }) => {
         autoRescheduleTasks();
     }, []);
 
+    const generatePhysicsMockData = () => {
+        console.log('Generating Physics Mock Data...');
+
+        // Clear old data first
+        localStorage.removeItem('acadbox_courses');
+        localStorage.removeItem('acadbox_tasks');
+        localStorage.removeItem('acadbox_grades');
+        localStorage.removeItem('acadbox_attendance');
+
+        const subjects = [
+            "Quantum Mechanics (Advanced)", "Solid State Physics", "Electromagnetic Theory",
+            "Statistical Mechanics", "Nuclear & Particle Physics", "Nanoscience & Nanotechnology",
+            "Materials Science & Engineering", "Optics & Photonics", "Semiconductor Devices",
+            "Computational Physics", "Machine Learning for Physicists", "Plasma Physics",
+            "Renewable Energy Systems", "MEMS & Sensors", "Research Project / Thesis"
+        ];
+
+        const semestersList = ['Semester 1 2024', 'Semester 2 2024', 'Semester 1 2025', 'Semester 2 2025'];
+
+        const newCourses = [];
+        const newTasks = [];
+        const newGrades = [];
+        const newAttendance = [];
+
+        let courseIdCounter = 1;
+        let taskIdCounter = 1;
+
+        // Subject-specific task templates
+        const subjectTasksMap = {
+            "Quantum Mechanics (Advanced)": ["Schrodinger Equation Derivation", "Harmonic Oscillator Problem Set", "Quantum Tunneling Lab Report"],
+            "Solid State Physics": ["Crystal Structure Analysis", "Semiconductor Band Gap Report", "X-Ray Diffraction Lab"],
+            "Electromagnetic Theory": ["Maxwell's Equations Derivation", "Waveguide Simulation Project", "Antenna Design Problem Set"],
+            "Statistical Mechanics": ["Partition Function Calculation", "Ising Model Simulation", "Thermodynamics vs StatMech Essay"],
+            "Nuclear & Particle Physics": ["Alpha Decay Half-Life Lab", "Standard Model Review Paper", "Cyclotron Design Project"],
+            "Nanoscience & Nanotechnology": ["Carbon Nanotube Synthesis Lab", "AFM Imaging Report", "Quantum Dot Applications Essay"],
+            "Materials Science & Engineering": ["Stress-Strain Analysis Lab", "Phase Diagram Problem Set", "Composite Materials Project"],
+            "Optics & Photonics": ["Laser Interferometry Lab", "Fiber Optics Communication Report", "Diffraction Pattern Analysis"],
+            "Semiconductor Devices": ["PN Junction Diode Lab", "MOSFET Characteristics Report", "Transistor Fabrication Steps"],
+            "Computational Physics": ["Monte Carlo Simulation Project", "Numerical Integration Code", "Differential Equation Solver"],
+            "Machine Learning for Physicists": ["Neural Network for Phase Transitions", "Data Fitting with Gaussian Processes", "Reinforcement Learning in Control"],
+            "Plasma Physics": ["Tokamak Confinement Essay", "Plasma Instabilities Simulation", "Fusion Energy Feasibility Report"],
+            "Renewable Energy Systems": ["Solar Cell Efficiency Lab", "Wind Turbine Aerodynamics Project", "Energy Storage Systems Review"],
+            "MEMS & Sensors": ["Accelerometer Design Project", "Microfluidics Lab Report", "Pressure Sensor Calibration"],
+            "Research Project / Thesis": ["Literature Review Draft", "Methodology Section", "Preliminary Results Presentation"]
+        };
+
+        subjects.forEach((subject, index) => {
+            // Assign ALL courses to the first semester so they are visible immediately
+            const semesterIndex = 0;
+            const semesterName = semestersList[semesterIndex];
+            const courseId = courseIdCounter++;
+
+            // Create Course
+            newCourses.push({
+                id: courseId,
+                name: subject,
+                code: `PHY${300 + index}`,
+                credits: 3 + (index % 2),
+                semesterId: 1, // Assuming ID 1 corresponds to the first semester
+                semester: semesterName, // Required for filtering
+                color: ['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#10b981', '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef'][index % 10],
+                schedule: { day: 'Monday', time: '10:00 AM' } // Simplified
+            });
+
+            // Create Grades
+            newGrades.push({
+                id: index + 1,
+                courseId: courseId,
+                grade: ['A', 'A-', 'B+', 'B'][index % 4],
+                title: 'Mid-Term Exam', // Added title for completeness
+                scored: 85 + (index % 15), // Changed score to scored
+                total: 100, // Added total
+                weightage: 30, // Added weightage
+                date: new Date().toISOString().split('T')[0] // Added date
+            });
+
+            // Create Attendance
+            newAttendance.push({
+                id: index + 1,
+                courseId: courseId,
+                attended: 20 + (index % 10),
+                total: 24 + (index % 10)
+            });
+
+            // Create Tasks (3 per course -> 45 total)
+            const specificTasks = subjectTasksMap[subject] || [`Assignment - ${subject}`, `Quiz - ${subject}`, `Project - ${subject}`];
+            const numTasks = 3;
+            for (let i = 0; i < numTasks; i++) {
+                // Distribute: 1 Today, 1 Tomorrow, 1 Later
+                const isToday = i === 0;
+                const isTomorrow = i === 1;
+                const isLater = i === 2;
+
+                let deadline = new Date();
+                if (isTomorrow) deadline.setDate(deadline.getDate() + 1);
+                if (isLater) deadline.setDate(deadline.getDate() + 5 + (index % 5)); // Spread out later tasks
+
+                newTasks.push({
+                    id: taskIdCounter++,
+                    courseId: courseId,
+                    title: specificTasks[i] || `${['Assignment', 'Lab Report', 'Project', 'Quiz'][i % 4]} - ${subject.split(' ')[0]}`,
+                    type: ['Assignment', 'Project', 'Exam', 'Quiz'][i % 4],
+                    deadline: deadline.toISOString().split('T')[0],
+                    effort: 2 + (i % 3),
+                    status: 'pending',
+                    ai_priority_label: isToday ? 'Today' : (isTomorrow ? 'Tomorrow' : 'Low') // Pre-seed priority
+                });
+            }
+        });
+
+        // Update State
+        setCourses(newCourses);
+        setTasks(newTasks);
+        setGrades(newGrades);
+        setAttendance(newAttendance);
+        setSemesters(semestersList);
+        setCurrentSemester(semestersList[0]);
+
+        // Persist with CORRECT keys
+        localStorage.setItem('acadbox_courses', JSON.stringify(newCourses));
+        localStorage.setItem('acadbox_tasks', JSON.stringify(newTasks));
+        localStorage.setItem('acadbox_grades', JSON.stringify(newGrades));
+        localStorage.setItem('acadbox_attendance', JSON.stringify(newAttendance));
+        localStorage.setItem('acadbox_semesters', JSON.stringify(semestersList));
+        localStorage.setItem('acadbox_currentSemester', JSON.stringify(semestersList[0]));
+        localStorage.setItem('mockData_Physics_v7', 'true');
+
+        // Force reload to reflect changes
+        window.location.reload();
+    };
+
+    // Mock Data Generation (Run once)
+    useEffect(() => {
+        const MOCK_DATA_VERSION = 'mockData_Physics_v7'; // Bump version to v7
+        const hasGenerated = localStorage.getItem(MOCK_DATA_VERSION);
+
+        if (!hasGenerated) {
+            generatePhysicsMockData();
+        }
+    }, []);
+
     const [aiInsights, setAiInsights] = useState({});
     const [aiPrioritizedTasks, setAiPrioritizedTasks] = useState([]);
     const [isAiLoading, setIsAiLoading] = useState(false);
@@ -566,6 +826,29 @@ export const AcademicProvider = ({ children }) => {
             return null;
         }
     };
+
+    const [isAiOnline, setIsAiOnline] = useState(false);
+
+    const checkAiStatus = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/ai/health');
+            if (response.ok) {
+                const data = await response.json();
+                setIsAiOnline(data.status === 'online');
+            } else {
+                setIsAiOnline(false);
+            }
+        } catch (error) {
+            setIsAiOnline(false);
+        }
+    };
+
+    // Check AI Status on Mount and Periodically
+    useEffect(() => {
+        checkAiStatus();
+        const interval = setInterval(checkAiStatus, 30000); // Check every 30 seconds
+        return () => clearInterval(interval);
+    }, []);
 
     // Centralized AI Task Prioritization with Debouncing
     useEffect(() => {
@@ -597,11 +880,27 @@ export const AcademicProvider = ({ children }) => {
                 if (result && result.sortedTasks) {
                     setAiPrioritizedTasks(result.sortedTasks);
                 } else {
-                    setAiPrioritizedTasks(pending); // Fallback
+                    // Fallback: Add labels locally
+                    const fallbackTasks = pending.map(t => {
+                        const daysUntil = Math.ceil((new Date(t.deadline) - new Date()) / (1000 * 60 * 60 * 24));
+                        let label = 'Low';
+                        if (daysUntil <= 1) label = 'Today';
+                        else if (daysUntil <= 3) label = 'Tomorrow';
+                        return { ...t, ai_priority_label: label };
+                    });
+                    setAiPrioritizedTasks(fallbackTasks);
                 }
             } catch (error) {
                 console.error("Failed to prioritize tasks:", error);
-                setAiPrioritizedTasks(pending);
+                // Fallback: Add labels locally
+                const fallbackTasks = pending.map(t => {
+                    const daysUntil = Math.ceil((new Date(t.deadline) - new Date()) / (1000 * 60 * 60 * 24));
+                    let label = 'Low';
+                    if (daysUntil <= 1) label = 'Today';
+                    else if (daysUntil <= 3) label = 'Tomorrow';
+                    return { ...t, ai_priority_label: label };
+                });
+                setAiPrioritizedTasks(fallbackTasks);
             } finally {
                 setIsAiLoading(false);
             }
@@ -615,6 +914,45 @@ export const AcademicProvider = ({ children }) => {
         return () => clearTimeout(timer);
     }, [tasks, courses]);
 
+    // Calendar Event Management
+    const addCalendarEvent = (eventData) => {
+        const newEvent = {
+            ...eventData,
+            id: Date.now()
+        };
+        setCalendarEvents([...calendarEvents, newEvent]);
+    };
+
+    const editCalendarEvent = (eventId, updates) => {
+        setCalendarEvents(prev =>
+            prev.map(event => event.id === eventId ? { ...event, ...updates } : event)
+        );
+    };
+
+    const deleteCalendarEvent = (eventId) => {
+        setCalendarEvents(prev => prev.filter(event => event.id !== eventId));
+    };
+
+    // Notes Management
+    const addNote = (noteData) => {
+        const newNote = {
+            ...noteData,
+            id: Date.now(),
+            timestamp: Date.now()
+        };
+        setNotes([newNote, ...notes]);
+    };
+
+    const editNote = (noteId, updates) => {
+        setNotes(prev =>
+            prev.map(note => note.id === noteId ? { ...note, ...updates, timestamp: Date.now() } : note)
+        );
+    };
+
+    const deleteNote = (noteId) => {
+        setNotes(prev => prev.filter(note => note.id !== noteId));
+    };
+
     return (
         <AcademicContext.Provider value={{
             courses, tasks, schedule, settings, grades, semesters, currentSemester, focusSessions, attendance,
@@ -623,10 +961,20 @@ export const AcademicProvider = ({ children }) => {
             setCourses, setSemesters, updateSemester, deleteSemester, deleteAllSemesters, addFocusSession,
             getPriorityExplanation, getAcademicHealthBreakdown, getWeakSubjectInsight,
             getEffortAccuracyInsight, getWeeklyReflection, getConfidenceIndicator,
+            getGpaInsight, // Exposed for Dashboard
             updateAttendance, getAttendanceStatus, getAttendanceInsights, getPerformanceColor,
             activeSession, startSession, breakSession, endSession, streak,
             fetchAIInsight, aiInsights, setAiInsights,
-            aiPrioritizedTasks, isAiLoading
+            aiPrioritizedTasks, isAiLoading, isAiOnline,
+
+            generatePhysicsMockData, // Exposed for Settings.jsx
+            profile, setProfile, // Exposed for Profile.jsx
+
+            // Calendar
+            calendarEvents, addCalendarEvent, editCalendarEvent, deleteCalendarEvent,
+
+            // Notes
+            notes, addNote, editNote, deleteNote
         }}>
             {children}
         </AcademicContext.Provider>

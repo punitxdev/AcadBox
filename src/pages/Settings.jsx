@@ -1,11 +1,11 @@
 import React from 'react';
 import { useAcademic } from '../context/AcademicContext';
 import { FaDownload, FaTrashAlt, FaDatabase } from 'react-icons/fa';
-import { MOCK_DATA } from '../utils/mockData';
+
 import './Settings.css';
 
 const Settings = () => {
-    const { settings, updateSettings, deleteAllSemesters, courses, tasks, grades, attendance, semesters, focusSessions } = useAcademic();
+    const { settings, updateSettings, deleteAllSemesters, courses, tasks, grades, attendance, semesters, focusSessions, generatePhysicsMockData } = useAcademic();
 
     const handleExport = () => {
         const data = {
@@ -34,16 +34,8 @@ const Settings = () => {
     };
 
     const handleLoadDemoData = () => {
-        if (window.confirm('This will OVERWRITE your current data with demo data. Continue?')) {
-            localStorage.setItem('acadbox_courses', JSON.stringify(MOCK_DATA.courses));
-            localStorage.setItem('acadbox_tasks', JSON.stringify(MOCK_DATA.tasks));
-            localStorage.setItem('acadbox_attendance', JSON.stringify(MOCK_DATA.attendance));
-            localStorage.setItem('acadbox_grades', JSON.stringify(MOCK_DATA.grades));
-            localStorage.setItem('acadbox_focusSessions', JSON.stringify(MOCK_DATA.focusSessions));
-            localStorage.setItem('acadbox_streak', JSON.stringify(MOCK_DATA.streak));
-            localStorage.setItem('acadbox_currentSemester', JSON.stringify(MOCK_DATA.currentSemester));
-            localStorage.setItem('acadbox_semesters', JSON.stringify(MOCK_DATA.semesters));
-            window.location.reload();
+        if (window.confirm('This will OVERWRITE your current data with Physics Demo Data (45 tasks). Continue?')) {
+            generatePhysicsMockData();
         }
     };
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaHome, FaBook, FaCalendarAlt, FaChartBar, FaChartLine, FaClock, FaCog, FaTimes, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaHome, FaBook, FaCalendarAlt, FaChartBar, FaChartLine, FaClock, FaCog, FaTimes, FaEdit, FaTrash, FaUser, FaTable } from 'react-icons/fa';
 import { useAcademic } from '../context/AcademicContext';
 import logo from '../assets/logo.png';
 import './Sidebar.css';
@@ -82,7 +82,16 @@ const Sidebar = ({ isOpen, onClose }) => {
                     <FaBook /> <span>Courses</span>
                 </Link>
                 <Link to="/schedule" className={`nav-item ${isActive('/schedule')}`} onClick={onClose}>
-                    <FaCalendarAlt /> <span>Smart Schedule</span>
+                    <FaCalendarAlt /> <span>Schedule</span>
+                </Link>
+                <Link to="/timetable" className={`nav-item ${isActive('/timetable')}`} onClick={onClose}>
+                    <FaTable /> <span>Time Table</span>
+                </Link>
+                <Link to="/calendar" className={`nav-item ${isActive('/calendar')}`} onClick={onClose}>
+                    <FaCalendarAlt /> <span>Calendar</span>
+                </Link>
+                <Link to="/notes" className={`nav-item ${isActive('/notes')}`} onClick={onClose}>
+                    <FaEdit /> <span>Notes</span>
                 </Link>
                 <Link to="/attendance" className={`nav-item ${isActive('/attendance')}`} onClick={onClose}>
                     <FaChartLine /> <span>Attendance</span>
@@ -96,7 +105,10 @@ const Sidebar = ({ isOpen, onClose }) => {
             </div>
 
             <div className="nav-footer">
-                <Link to="/settings" className="nav-item" onClick={onClose}>
+                <Link to="/profile" className={`nav-item ${isActive('/profile')}`} onClick={onClose}>
+                    <FaUser /> <span>Profile</span>
+                </Link>
+                <Link to="/settings" className={`nav-item ${isActive('/settings')}`} onClick={onClose}>
                     <FaCog /> <span>Settings</span>
                 </Link>
             </div>

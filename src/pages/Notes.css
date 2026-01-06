@@ -1,0 +1,229 @@
+.notes-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.notes-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.search-box {
+    flex: 1;
+    max-width: 400px;
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+}
+
+.add-note-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.add-note-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.notes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.note-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+}
+
+.note-card:hover {
+    border-color: var(--accent-blue);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    gap: 12px;
+}
+
+.note-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    flex: 1;
+    word-wrap: break-word;
+}
+
+.note-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.note-action-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.note-action-btn:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.note-action-btn.delete:hover {
+    color: var(--accent-red);
+}
+
+.note-content {
+    flex: 1;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: 0 0 12px 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+}
+
+.note-footer {
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+}
+
+.note-date {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.empty-notes-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+}
+
+.empty-notes-state p {
+    font-size: 1rem;
+}
+
+.note-form {
+    padding: 24px;
+}
+
+.note-form .form-group {
+    margin-bottom: 20px;
+}
+
+.note-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.note-form .required {
+    color: var(--accent-red);
+}
+
+.note-form input[type="text"],
+.note-form textarea {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.note-form input[type="text"]:focus,
+.note-form textarea:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+}
+
+.note-form textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+@media (max-width: 768px) {
+    .notes-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-box {
+        max-width: none;
+    }
+
+    .add-note-btn {
+        justify-content: center;
+    }
+
+    .notes-grid {
+        grid-template-columns: 1fr;
+    }
+}

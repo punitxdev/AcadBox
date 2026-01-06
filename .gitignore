@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# AI Models (Too large for GitHub)
+aiModels/*.pkl
+python_service/venv
+server/.env

@@ -1,0 +1,234 @@
+.calendar-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.calendar-container {
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid var(--border-color);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.month-year {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.month-year h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.nav-btn {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.nav-btn:hover {
+    background: var(--accent-blue);
+    color: white;
+    border-color: var(--accent-blue);
+}
+
+.today-btn {
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.today-btn:hover {
+    opacity: 0.9;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.weekday-header {
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    padding: 12px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.calendar-day {
+    min-height: 100px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.calendar-day:hover {
+    border-color: var(--accent-blue);
+    background: var(--bg-secondary);
+}
+
+.calendar-day.empty {
+    background: transparent;
+    border: none;
+    cursor: default;
+}
+
+.calendar-day.today {
+    border: 2px solid var(--accent-blue);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.calendar-day.holiday {
+    background: rgba(139, 92, 246, 0.05);
+}
+
+.day-number {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.reminder-icon {
+    color: var(--accent-blue);
+    font-size: 0.85rem;
+}
+
+.holiday-label {
+    font-size: 0.7rem;
+    color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.15);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.event-label {
+    font-size: 0.7rem;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.event-label:hover {
+    opacity: 0.8;
+}
+
+.event-label.academic {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--accent-blue);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.event-label.personal {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--accent-green);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.calendar-legend {
+    display: flex;
+    gap: 24px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+    justify-content: center;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.legend-dot.academic {
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.legend-dot.personal {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.legend-icon {
+    color: var(--accent-blue);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .calendar-day {
+        min-height: 80px;
+        padding: 6px;
+    }
+
+    .weekday-header {
+        font-size: 0.75rem;
+        padding: 8px 0;
+    }
+
+    .event-label,
+    .holiday-label {
+        font-size: 0.65rem;
+    }
+
+    .calendar-legend {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+}

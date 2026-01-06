@@ -94,7 +94,7 @@ const Grades = () => {
             const gradePercentage = g.total > 0 ? (g.scored / g.total) : 0;
             return sum + (gradePercentage * (g.weightage || 0));
         }, 0);
-        const calibratedScore = totalWeightage > 0 ? weightedScore.toFixed(2) : 0;
+        const calibratedScore = totalWeightage > 0 ? ((weightedScore / totalWeightage) * 100).toFixed(2) : 0;
 
         const byType = ['Quiz', 'Assignment', 'Mid-Sem', 'End-Sem'].map(type => {
             const typeGrades = courseGrades.filter(g => g.type === type);

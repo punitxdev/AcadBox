@@ -32,6 +32,10 @@ PRIORITY_LABELS = {
     2: "Today"
 }
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({"status": "online", "models_loaded": task_model is not None and health_model is not None})
+
 @app.route('/predict', methods=['POST'])
 def predict_task_priority():
     try:

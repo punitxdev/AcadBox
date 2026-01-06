@@ -1,33 +1,26 @@
 .sidebar {
-    width: 250px;
+    width: 260px;
     height: 100vh;
     position: fixed;
     left: 0;
     top: 0;
-    background-color: var(--bg-secondary);
+    background-color: var(--bg-card);
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    padding: 24px 16px;
+    padding: 24px 0;
     z-index: 1000;
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow-y: auto;
-    scrollbar-width: none;
-    /* Firefox */
-    -ms-overflow-style: none;
-    /* IE and Edge */
 }
 
-.sidebar::-webkit-scrollbar {
-    display: none;
-    /* Chrome, Safari and Opera */
-}
-
+/* Header & Logo */
 .sidebar-header {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-bottom: 32px;
+    padding: 0 24px;
     position: relative;
 }
 
@@ -36,36 +29,36 @@
     background: none;
     border: none;
     color: var(--text-secondary);
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     cursor: pointer;
-    padding: 4px;
+    padding: 6px;
     position: absolute;
-    right: 0;
+    right: 10px;
+    top: 0;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.sidebar-close:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
 }
 
 .logo-container {
-    padding: 16px 0;
     display: flex;
     justify-content: center;
     width: 100%;
 }
 
 .sidebar-logo {
-    height: 100px;
+    height: 40px;
     width: auto;
     object-fit: contain;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.sidebar-logo:hover {
-    transform: scale(1.05) translateY(-2px);
-    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
-}
-
+/* Semester Selector */
 .semester-selector-container {
-    margin-bottom: 24px;
-    padding: 0 8px;
+    margin: 0 16px 24px;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -78,8 +71,8 @@
 }
 
 .semester-selector-container label {
-    font-size: 0.7rem;
-    font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: 600;
     text-transform: uppercase;
     color: var(--text-secondary);
     letter-spacing: 0.05em;
@@ -88,24 +81,23 @@
 .sidebar-manage-btn {
     background: none;
     border: none;
-    color: var(--accent-blue);
+    color: var(--primary);
     font-size: 0.75rem;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
-    padding: 2px 4px;
-    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 4px;
     transition: all 0.2s;
 }
 
 .sidebar-manage-btn:hover {
-    color: #2563eb;
-    text-decoration: underline;
+    background: var(--primary-light);
 }
 
 .sidebar-semester-select {
     width: 100%;
     padding: 10px 12px;
-    background-color: var(--bg-tertiary);
+    background: var(--bg-app);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     color: var(--text-primary);
@@ -114,140 +106,91 @@
     cursor: pointer;
     outline: none;
     transition: all 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px;
 }
 
 .sidebar-semester-select:hover {
-    border-color: var(--accent-blue);
+    border-color: var(--text-tertiary);
 }
 
 .sidebar-semester-select:focus {
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
 }
 
-/* Semester Manager specific styles in Sidebar */
-.v5-semester-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 32px;
-    max-height: 400px;
-    overflow-y: auto;
-    padding-right: 8px;
-}
-
-.v5-empty-modal-state {
-    text-align: center;
-    padding: 32px 16px;
-    background: var(--bg-tertiary);
-    border-radius: 16px;
-    border: 1px dashed var(--border-color);
-}
-
-.v5-empty-modal-state p {
-    color: var(--text-secondary);
-    font-size: 0.95rem;
-    margin: 0;
-}
-
-.v5-semester-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px;
-    background: var(--bg-tertiary);
-    border-radius: 16px;
-    transition: all 0.2s;
-}
-
-.v5-semester-item:hover {
-    background: var(--border-color);
-}
-
-.v5-semester-name {
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.v5-semester-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.v5-action-btn {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 8px;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.v5-action-btn:hover {
-    background: var(--bg-tertiary);
-    color: var(--accent-blue);
-}
-
-.v5-action-btn.delete:hover {
-    color: var(--accent-red);
-}
-
-.v5-edit-semester-row {
-    display: flex;
-    gap: 12px;
-    width: 100%;
-}
-
-.v5-edit-semester-row .v5-input {
-    flex: 1;
-}
-
+/* Navigation Menu */
 .nav-menu {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
+    padding: 0 12px;
 }
 
 .nav-item {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 16px;
+    padding: 10px 14px;
     border-radius: 8px;
     color: var(--text-secondary);
     text-decoration: none;
     font-weight: 500;
+    font-size: 0.95rem;
     transition: all 0.2s;
 }
 
+.nav-item svg {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    color: var(--text-tertiary);
+    transition: color 0.2s;
+}
+
 .nav-item:hover {
-    background-color: var(--bg-tertiary);
+    background: var(--bg-hover);
     color: var(--text-primary);
 }
 
+.nav-item:hover svg {
+    color: var(--text-secondary);
+}
+
 .nav-item.active {
-    background-color: var(--accent-blue);
-    color: white;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 600;
 }
 
+.nav-item.active svg {
+    color: var(--primary);
+}
+
+/* Footer */
 .nav-footer {
-    padding-top: 24px;
+    padding: 16px 12px 0;
+    margin-top: auto;
     border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
+/* Mobile Responsive */
 @media (max-width: 768px) {
     .sidebar {
-        left: -250px;
-        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
+        transform: translateX(-100%);
+        box-shadow: none;
+        width: 280px;
     }
 
     .sidebar.open {
-        left: 0;
+        transform: translateX(0);
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
     }
 
     .sidebar-close {

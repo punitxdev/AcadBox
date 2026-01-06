@@ -1,0 +1,147 @@
+.timetable-page {
+    padding: 1rem;
+    height: 100%;
+    overflow-y: auto;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.timetable-header {
+    margin-bottom: 1rem;
+}
+
+.timetable-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.timetable-header p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.timetable-grid {
+    display: grid;
+    grid-template-columns: 60px repeat(5, 1fr);
+    /* Time column + 5 days */
+    gap: 0.5rem;
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    overflow-x: auto;
+}
+
+.grid-header-cell {
+    font-weight: 600;
+    text-align: center;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.time-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+}
+
+.time-slot-label {
+    height: 60px;
+    /* Reduced height */
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    color: var(--text-tertiary);
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.day-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+    position: relative;
+}
+
+.day-column::before {
+    content: '';
+    position: absolute;
+    left: -0.25rem;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--border-color);
+    opacity: 0.5;
+}
+
+.timetable-slot {
+    height: 60px;
+    /* Reduced height */
+    border-radius: 8px;
+    padding: 0.5rem;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+}
+
+.timetable-slot.empty {
+    background: var(--bg-tertiary);
+    opacity: 0.3;
+    border: 1px dashed var(--border-color);
+}
+
+.timetable-slot.filled {
+    background: var(--card-bg);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+}
+
+.timetable-slot.filled:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.slot-course-name {
+    font-weight: 600;
+    font-size: 0.8rem;
+    margin-bottom: 0.1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+.slot-time {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    line-height: 1.1;
+}
+
+.slot-location {
+    font-size: 0.65rem;
+    opacity: 0.7;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .timetable-grid {
+        min-width: 600px;
+        /* Force scroll on smaller screens */
+    }
+}

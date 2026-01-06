@@ -1,33 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAcademic } from '../context/AcademicContext';
 import TaskInput from '../components/TaskInput';
-import { FaCheckCircle, FaExclamationCircle, FaInfoCircle, FaLightbulb, FaHistory, FaFire } from 'react-icons/fa';
+import { FaCheckCircle, FaFire } from 'react-icons/fa';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
+import FocusTimer from '../components/FocusTimer';
 import './Dashboard.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
-
-// StreakWidget component is no longer used as its content is integrated into the Dashboard header.
-// Keeping it here for reference if needed, but it will be removed from the render flow.
-const StreakWidget = ({ streak }) => {
-    const isCracked = streak.status === 'cracked';
-
-    return (
-        <div className={`card streak-card ${isCracked ? 'cracked' : ''}`}>
-            <div className="streak-header">
-                <div className="streak-icon-wrapper">
-                    <FaFire className={`streak-icon ${isCracked ? 'cracked-icon' : ''} icon-small`} />
-                </div>
-                <div className="streak-info">
-                    <h3>{streak.current} Day Streak</h3>
-                    <p>{isCracked ? "Momentum broken. Resume today to prevent decay." : "Consistency is key. Keep it up."}</p>
-                </div>
-            </div>
-            {isCracked && <div className="crack-overlay"></div>}
-        </div>
-    );
-};
 
 const Dashboard = () => {
     const {
@@ -36,20 +16,18 @@ const Dashboard = () => {
         tasks,
         streak,
         fetchAIInsight,
-        courses, // Keep courses for getCourseName
-        completeTask, // Keep completeTask for task completion
-        getPriorityExplanation, // Keep getPriorityExplanation for priority tasks
+        courses,
+        completeTask,
+        getPriorityExplanation,
         aiPrioritizedTasks,
-        isAiLoading
+        isAiLoading,
+        getGpaInsight
     } = useAcademic();
 
     const health = getAcademicHealthBreakdown();
     const reflection = getWeeklyReflection();
     const [dashboardInsight, setDashboardInsight] = useState("Analyzing academic momentum...");
     const [aiHealth, setAiHealth] = useState(null);
-
-    const [sortedTasks, setSortedTasks] = useState([]); // Kept for compatibility if needed, but we'll use aiPrioritizedTasks
-    // const [isThinking, setIsThinking] = useState(true); // Removed local state
 
     useEffect(() => {
         const getInsight = async () => {
@@ -65,17 +43,15 @@ const Dashboard = () => {
             const healthData = await fetchAIInsight('academic-health', {
                 taskCompletionRate: health.taskCompletion / 100,
                 attendancePercent: health.attendancePerformance,
-                averageGrade: (health.gradePerformance / 100) * 10, // Approx mapping
+                averageGrade: (health.gradePerformance / 100) * 10,
                 focusHoursWeek: parseFloat(reflection.focusHours),
-                streakConsistency: streak.status === 'solid' ? 1.0 : 0.5, // Simple mapping
-                overdueRatio: 0.1 // Mock for now or calculate
+                streakConsistency: streak.status === 'solid' ? 1.0 : 0.5,
+                overdueRatio: 0.1
             });
 
             if (healthData && healthData.academic_health_score !== undefined) {
                 setAiHealth(healthData);
             }
-
-            // Prioritize Tasks logic removed - using centralized context
         };
         getInsight();
     }, [streak.current, reflection.focusHours, tasks, fetchAIInsight]);
@@ -83,7 +59,6 @@ const Dashboard = () => {
     const pendingTasks = tasks.filter(t => t.status === 'pending');
     const completedTasks = tasks.filter(t => t.status === 'completed');
 
-    // Use AI Score if available, else fallback to local calculation
     const localHealthScore = Math.round(
         (health.taskCompletion * 0.3) +
         (health.focusConsistency * 0.2) +
@@ -95,136 +70,112 @@ const Dashboard = () => {
     const displayHealthStatus = aiHealth ? aiHealth.health_status : (localHealthScore > 80 ? "Excellent" : "Needs Attention");
 
     const chartData = {
-        labels: ['Completed', 'Pending'],
+        labels: ['Health Score', 'Gap'],
         datasets: [
             {
-                data: [completedTasks.length, pendingTasks.length],
-                backgroundColor: ['#10b981', '#3b82f6'],
+                data: [displayHealthScore, 100 - displayHealthScore],
+                backgroundColor: [
+                    displayHealthScore >= 80 ? '#10b981' : displayHealthScore >= 60 ? '#f59e0b' : '#ef4444',
+                    '#e2e8f0'
+                ],
                 borderWidth: 0,
+                cutout: '85%',
             },
         ],
     };
 
     const getCourseName = (id) => courses.find(c => c.id === id)?.name || 'Unknown';
 
-    console.log('Dashboard render');
+    // Get the top priority task for the focus timer
+    const currentFocusTask = aiPrioritizedTasks.length > 0
+        ? { ...aiPrioritizedTasks[0], courseName: getCourseName(aiPrioritizedTasks[0].courseId) }
+        : null;
+
     return (
         <div className="dashboard">
-            {/* Debug placeholder */}
-            <div style={{ padding: '1rem', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>Dashboard Loaded</div>
-            <header className="page-header">
-                <h1>Academic Dashboard</h1>
-                <p className="date-display">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
-                <div className="ai-dashboard-insight">
-                    <span className="ai-label">AI INSIGHT</span>
-                    {dashboardInsight}
+            <header className="dashboard-header">
+                <div className="header-left">
+                    <h1>Command Center</h1>
+                    <p className="date-display">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+                </div>
+                <div className="header-right">
+                    <div className="ai-status-badge">
+                        <div className="ai-pulse"></div>
+                        <span>AI ACTIVE</span>
+                    </div>
                 </div>
             </header>
 
-            <div className="dashboard-grid">
-                {/* Streak Widget */}
-                <StreakWidget streak={streak} />
+            <div className="dashboard-main-grid">
+                {/* Center Stage: Focus Timer */}
+                <div className="main-panel">
+                    <FocusTimer currentTask={currentFocusTask} onComplete={completeTask} />
 
-                {/* Health Card */}
-                <div className="card health-card">
-                    <div className="card-header-with-info">
-                        <h3>Academic Health (AI)</h3>
-                        <div className="health-breakdown-tooltip">
-                            <FaInfoCircle className="info-icon icon-small" />
-                            <div className="tooltip-content">
-                                <div className="tooltip-item">
-                                    <span>Task Completion</span>
-                                    <span>{health.taskCompletion}%</span>
-                                </div>
-                                <div className="tooltip-item">
-                                    <span>Focus Consistency</span>
-                                    <span>{health.focusConsistency}%</span>
-                                </div>
-                                <div className="tooltip-item">
-                                    <span>Grade Performance</span>
-                                    <span>{health.gradePerformance}%</span>
-                                </div>
-                                <div className="tooltip-item">
-                                    <span>Attendance</span>
-                                    <span>{health.attendancePerformance}%</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="chart-container">
-                        <div className="health-score">
-                            <span>{displayHealthScore}%</span>
-                        </div>
-                        <Doughnut data={chartData} options={{ cutout: '70%', plugins: { legend: { display: false } } }} />
-                    </div>
-                    <p className="health-status">
-                        {displayHealthStatus}
-                    </p>
-                </div>
-
-                {/* Priority Tasks */}
-                <div className="card priority-card">
-                    <h3>Top Priorities (AI Sorted)</h3>
-                    <div className="task-list">
-                        {isAiLoading ? (
-                            <div className="ai-thinking-mini" style={{ padding: '20px', textAlign: 'center' }}>
-                                <div className="ai-pulse-ring" style={{ width: '40px', height: '40px', margin: '0 auto 10px' }}></div>
-                                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>AI is prioritizing...</p>
-                            </div>
-                        ) : (
-                            <>
-                                {aiPrioritizedTasks.slice(0, 3).map(task => (
-                                    <div key={task.id} className="task-item">
-                                        <div className="task-info">
-                                            <div className="task-header">
-                                                <span className="task-course" style={{ color: courses.find(c => c.id === task.courseId)?.color }}>
-                                                    {getCourseName(task.courseId)}
-                                                </span>
-                                                <div className="ai-explanation-tooltip">
-                                                    <FaInfoCircle className="info-icon-small icon-small" />
-                                                    <div className="tooltip-content-wide">
-                                                        {getPriorityExplanation(task.id)}
-                                                        <br />
-                                                        <small>AI Priority: {task.ai_priority_label || 'Calculating...'}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <h4>{task.title}</h4>
-                                            <span className="task-meta">Due: {task.deadline} • Effort: {task.effort}h</span>
-                                        </div>
-                                        <button className="btn-check" onClick={() => completeTask(task.id)}>
-                                            <FaCheckCircle className="icon-small" />
-                                        </button>
-                                    </div>
-                                ))}
-                                {aiPrioritizedTasks.length === 0 && pendingTasks.length === 0 && <p className="empty-state">No pending tasks. Great job!</p>}
-                            </>
-                        )}
+                    {/* AI Insight Below Timer */}
+                    <div className="ai-insight-bar">
+                        <span className="ai-label">SYSTEM INSIGHT</span>
+                        <p>{dashboardInsight}</p>
                     </div>
                 </div>
 
-                {/* Weekly Reflection Card */}
-                <div className="card reflection-card">
-                    <div className="card-header">
-                        <FaHistory className="header-icon icon-small" />
-                        <h3>Weekly Reflection</h3>
-                    </div>
-                    <div className="reflection-content">
-                        <div className="reflection-stats">
-                            <div className="stat-item">
-                                <span className="stat-value">{reflection.tasksCompleted}</span>
-                                <span className="stat-label">Tasks Done</span>
+                {/* Right Panel: Stats & Health */}
+                <div className="right-panel">
+                    {/* Health Widget */}
+                    <div className="health-widget">
+                        <div className="widget-header">
+                            <h3>Academic Health</h3>
+                            {aiHealth && <span className="ai-badge-small" title="AI Enhanced">AI</span>}
+                        </div>
+                        <div className="health-chart-wrapper">
+                            <div className="health-score-display">
+                                <span className="score-value">{displayHealthScore}%</span>
                             </div>
-                            <div className="stat-item">
-                                <span className="stat-value">{reflection.focusHours}h</span>
-                                <span className="stat-label">Focus Time</span>
+                            <Doughnut data={chartData} options={{ plugins: { legend: { display: false }, tooltip: { enabled: false } } }} />
+                        </div>
+                        <p className="health-status-text" style={{ color: displayHealthScore >= 80 ? 'var(--accent-green)' : displayHealthScore >= 60 ? '#f59e0b' : 'var(--accent-red)' }}>
+                            {displayHealthStatus}
+                        </p>
+                    </div>
+
+                    {/* Streak Widget */}
+                    <div className="streak-widget">
+                        <div className={`streak-fire ${streak.status === 'cracked' ? 'cracked' : ''}`}>
+                            <FaFire />
+                        </div>
+                        <div className="streak-details">
+                            <span className="streak-count">{streak.current} Days</span>
+                            <span className="streak-label">Consistency Streak</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Bottom Panel: Upcoming Tasks */}
+            <div className="bottom-panel">
+                <h3 className="section-title">Upcoming Priorities</h3>
+                <div className="horizontal-task-list">
+                    {aiPrioritizedTasks.slice(1, 5).map(task => (
+                        <div key={task.id} className="task-card-compact">
+                            <div className="task-card-header">
+                                <span className="task-course-tag">
+                                    {getCourseName(task.courseId)}
+                                </span>
+                                <span className="task-effort">{task.effort}h</span>
+                            </div>
+                            <h4>{task.title}</h4>
+                            <div className="task-card-footer">
+                                <span className="task-due">Due {task.deadline}</span>
+                                <button className="btn-icon-small" onClick={() => completeTask(task.id)}>
+                                    <FaCheckCircle />
+                                </button>
                             </div>
                         </div>
-                        <div className="reflection-insight">
-                            <FaLightbulb className="insight-icon icon-small" />
-                            <p>{reflection.insight}</p>
+                    ))}
+                    {aiPrioritizedTasks.length < 2 && (
+                        <div className="empty-tasks-placeholder">
+                            <p>No other urgent tasks. You're all caught up!</p>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
 

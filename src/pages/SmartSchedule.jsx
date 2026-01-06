@@ -1,14 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAcademic } from '../context/AcademicContext';
-import { FaInfoCircle, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaInfoCircle, FaEdit, FaTrash, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import './SmartSchedule.css';
 
 const SmartSchedule = () => {
-    const { courses, getAttendanceStatus, fetchAIInsight, tasks, editTask, deleteTask, aiPrioritizedTasks, isAiLoading } = useAcademic();
+    const { courses, getAttendanceStatus, fetchAIInsight, tasks, editTask, deleteTask, aiPrioritizedTasks, isAiLoading, isAiOnline } = useAcademic();
     const [editingTask, setEditingTask] = useState(null); // State for modal
     const [editForm, setEditForm] = useState({ title: '', deadline: '', effort: '', type: '' });
 
-    // Removed local AI fetching useEffect - using aiPrioritizedTasks from context
+    // Refs for scroll containers
+    const scrollRefs = {
+        Today: useRef(null),
+        Tomorrow: useRef(null),
+        Later: useRef(null)
+    };
+
+    const scrollRow = (day, direction) => {
+        if (scrollRefs[day].current) {
+            const scrollAmount = 300; // Approx card width + gap
+            scrollRefs[day].current.scrollBy({
+                left: direction === 'left' ? -scrollAmount : scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    };
 
     const getCourseColor = (id) => courses.find(c => c.id === id)?.color || '#555';
 
@@ -39,6 +54,10 @@ const SmartSchedule = () => {
             const shiftedCount = Math.max(0, 5 - todayTasks.length);
             return tomorrowTasks.slice(shiftedCount);
         }
+        // For Later column (Low priority)
+        if (day === 'Later') {
+            return aiPrioritizedTasks.filter(t => t.ai_priority_label === 'Low');
+        }
         return [];
     };
 
@@ -63,47 +82,110 @@ const SmartSchedule = () => {
     return (
         <div className="schedule-page">
             <header className="page-header">
-                <h1>Smart Schedule</h1>
-                <p className="date-display">AI-Optimized Study Plan (AI Active)</p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                    <div>
+                        <h1 className="page-title">Smart Schedule</h1>
+                        <p className="date-display">AI-Optimized Study Plan</p>
+                    </div>
+                    {isAiOnline ? (
+                        <span style={{
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            color: 'var(--accent-green)',
+                            border: '1px solid rgba(16, 185, 129, 0.2)',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
+                            fontSize: '0.8rem',
+                            fontWeight: '500',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                        }}>
+                            <span style={{
+                                width: '6px',
+                                height: '6px',
+                                backgroundColor: 'var(--accent-green)',
+                                borderRadius: '50%'
+                            }}></span>
+                            AI Active
+                        </span>
+                    ) : (
+                        <span style={{
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            color: 'var(--accent-red)',
+                            border: '1px solid rgba(239, 68, 68, 0.2)',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
+                            fontSize: '0.8rem',
+                            fontWeight: '500',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                        }}>
+                            <span style={{
+                                width: '6px',
+                                height: '6px',
+                                backgroundColor: 'var(--accent-red)',
+                                borderRadius: '50%'
+                            }}></span>
+                            AI Offline
+                        </span>
+                    )}
+                </div>
             </header>
 
             <div className="schedule-container">
-                {['Today', 'Tomorrow'].map(day => (
-                    <div key={day} className="day-column">
-                        <h3 className="day-title">{day}</h3>
-                        <div className="day-timeline">
-                            {getTasksForDay(day).map(task => (
-                                <div key={task.id} className="timeline-item" style={{ borderLeftColor: getCourseColor(task.courseId) }}>
-                                    <div className="timeline-time">{task.effort}h</div>
-                                    <div className="timeline-content">
-                                        <div className="timeline-header">
-                                            <h4>{task.title}</h4>
-                                            <div className="ai-explanation-tooltip">
-                                                <FaInfoCircle className="info-icon-small" />
-                                                <div className="tooltip-content-wide">
-                                                    AI Priority: {task.ai_priority_label || 'Calculating...'}
+                {['Today', 'Tomorrow', 'Later'].map(day => (
+                    <div key={day} className="day-section">
+                        <div className="section-header">
+                            <h3 className="section-title">{day === 'Later' ? 'Can be done later' : day}</h3>
+                            <div className="scroll-controls">
+                                <button className="scroll-btn" onClick={() => scrollRow(day, 'left')}><FaChevronLeft /></button>
+                                <button className="scroll-btn" onClick={() => scrollRow(day, 'right')}><FaChevronRight /></button>
+                            </div>
+                        </div>
+                        <div className="section-timeline" ref={scrollRefs[day]}>
+                            {getTasksForDay(day).map(task => {
+                                const course = courses.find(c => c.id === task.courseId);
+                                return (
+                                    <div key={task.id} className="timeline-item" style={{ borderLeftColor: getCourseColor(task.courseId) }}>
+                                        <div className="timeline-time">{task.effort}h</div>
+                                        <div className="timeline-content">
+                                            <div className="timeline-header">
+                                                <div className="task-title-group">
+                                                    <h4>{task.title}</h4>
+                                                    {course && <span className="course-name-badge" style={{ backgroundColor: `${course.color}20`, color: course.color }}>{course.name}</span>}
+                                                </div>
+                                                <div className="timeline-header-actions">
+                                                    <div className="ai-explanation-tooltip">
+                                                        <FaInfoCircle className="info-icon-small" />
+                                                        <div className="tooltip-content-wide">
+                                                            AI Priority: {task.ai_priority_label || 'Calculating...'}
+                                                        </div>
+                                                    </div>
+                                                    {day === 'Today' && task.ai_priority_label !== 'Today' && (
+                                                        <span className="shifted-badge">(Can do today)</span>
+                                                    )}
                                                 </div>
                                             </div>
-                                            {day === 'Today' && task.ai_priority_label !== 'Today' && (
-                                                <span className="shifted-badge" style={{ marginLeft: '8px', color: '#f59e0b', fontSize: '0.8rem' }}>(Can do today)</span>
-                                            )}
-                                        </div>
-                                        <div className="timeline-meta">
-                                            <span className="timeline-tag">{task.type}</span>
-                                            {/* Edit and Delete actions */}
-                                            <FaEdit className="action-icon" style={{ marginLeft: '8px', cursor: 'pointer' }} onClick={() => {
-                                                setEditingTask(task.id);
-                                                setEditForm({ title: task.title, deadline: task.deadline, effort: task.effort, type: task.type });
-                                            }} />
-                                            <FaTrash className="action-icon" style={{ marginLeft: '4px', cursor: 'pointer', color: 'red' }} onClick={() => {
-                                                if (confirm('Delete this task?')) deleteTask(task.id);
-                                            }} />
+                                            <div className="timeline-meta">
+                                                <span className="timeline-tag">{task.type}</span>
+                                                {/* Edit and Delete actions */}
+                                                <FaEdit className="action-icon" style={{ marginLeft: '8px', cursor: 'pointer' }} onClick={() => {
+                                                    setEditingTask(task.id);
+                                                    setEditForm({ title: task.title, deadline: task.deadline, effort: task.effort, type: task.type });
+                                                }} />
+                                                <FaTrash className="action-icon" style={{ marginLeft: '4px', cursor: 'pointer', color: 'red' }} onClick={() => {
+                                                    if (confirm('Delete this task?')) deleteTask(task.id);
+                                                }} />
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                             {getTasksForDay(day).length === 0 && (
-                                <p className="empty-slot">Free day! Relax or review.</p>
+                                <p className="empty-slot">
+                                    {day === 'Later' ? 'No low priority tasks.' : 'Free day! Relax or review.'}
+                                </p>
                             )}
                         </div>
                     </div>

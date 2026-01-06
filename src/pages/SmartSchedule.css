@@ -1,26 +1,122 @@
-.schedule-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
+.page-header {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.day-column {
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
+}
+
+.date-display {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ai-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #4ade80;
+    background: rgba(74, 222, 128, 0.1);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(74, 222, 128, 0.2);
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.1);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ai-badge::before {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 6px;
+    background-color: #4ade80;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #4ade80;
+}
+
+.day-section {
     background-color: var(--bg-secondary);
     border-radius: 12px;
     padding: 20px;
     border: 1px solid var(--border-color);
+    width: 100%;
 }
 
-.day-title {
-    margin-bottom: 20px;
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
     padding-bottom: 10px;
     border-bottom: 1px solid var(--border-color);
 }
 
-.day-timeline {
+.section-title {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+.scroll-controls {
     display: flex;
-    flex-direction: column;
+    gap: 8px;
+}
+
+.scroll-btn {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.scroll-btn:hover {
+    background: var(--accent-blue);
+    color: white;
+    border-color: var(--accent-blue);
+}
+
+.section-timeline {
+    display: flex;
     gap: 15px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    /* Hide scrollbar */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
+    padding-left: 4px;
+    /* Prevent cut-off shadows */
+    padding-right: 4px;
+}
+
+/* Hide scrollbar for Chrome/Safari/Opera */
+.section-timeline::-webkit-scrollbar {
+    display: none;
 }
 
 .timeline-item {
@@ -30,6 +126,21 @@
     background-color: var(--bg-tertiary);
     border-radius: 8px;
     border-left: 4px solid #555;
+    min-width: 280px;
+    /* Fixed width for cards */
+    flex: 0 0 280px;
+    scroll-snap-align: start;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
+    position: relative;
+    /* For z-index context */
+}
+
+.timeline-item:hover {
+    transform: scale(1.02);
+    z-index: 10;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    background-color: var(--bg-secondary);
+    /* Slight contrast boost */
 }
 
 .timeline-time {
@@ -38,12 +149,37 @@
     min-width: 40px;
 }
 
+.timeline-content {
+    flex: 1;
+    min-width: 0;
+    /* Allow text truncation */
+}
+
+.task-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 6px;
+}
+
 .timeline-content h4 {
-    margin-bottom: 5px;
+    margin: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 200px;
+    font-size: 1rem;
+}
+
+.course-name-badge {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    align-self: flex-start;
+    font-weight: 600;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .timeline-tag {
@@ -63,110 +199,123 @@
 .timeline-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     gap: 10px;
+    margin-bottom: 8px;
 }
 
-.timeline-meta {
+.task-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 6px;
+    flex: 1;
+    min-width: 0;
+    /* Critical for text truncation in flex item */
+}
+
+.timeline-header-actions {
     display: flex;
     align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+    gap: 8px;
+    flex-shrink: 0;
+    /* Prevent shrinking */
 }
 
-.status-badge {
+.timeline-content h4 {
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1rem;
+    width: 100%;
+}
+
+.shifted-badge {
     font-size: 0.7rem;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 4px;
-    background-color: rgba(255, 255, 255, 0.05);
-}
-
-.status-badge.rescheduled {
     color: #f59e0b;
+    white-space: nowrap;
+    /* Prevent wrapping */
+    background: rgba(245, 158, 11, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
-.status-badge.overdue {
-    color: var(--accent-red);
-}
-
-.status-badge.critical-attendance {
-    color: var(--accent-red);
-    font-weight: 700;
-    background-color: rgba(239, 68, 68, 0.1);
-}
-
-/* Tooltip styles (shared with Dashboard but scoped here if needed) */
 .ai-explanation-tooltip {
     position: relative;
-    display: inline-block;
+    display: inline-flex;
+    /* Better alignment */
+    align-items: center;
 }
 
-.info-icon-small {
-    color: var(--text-secondary);
-    cursor: help;
-    font-size: 0.9rem;
+.ai-explanation-tooltip:hover .tooltip-content-wide {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
 .tooltip-content-wide {
     visibility: hidden;
     position: absolute;
-    z-index: 10;
-    bottom: 125%;
-    right: 0;
+    z-index: 100;
+    /* High z-index */
+    top: 130%;
+    /* Position below */
+    bottom: auto;
+    right: -10px;
+    /* Align slightly right */
     background-color: var(--bg-tertiary);
     color: var(--text-primary);
     text-align: left;
     padding: 12px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    width: 250px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    width: 220px;
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.2s, transform 0.2s;
     font-size: 0.85rem;
+    transform: translateY(-5px);
+    pointer-events: none;
+    /* Prevent hovering the tooltip itself causing issues */
 }
 
-.ai-explanation-tooltip:hover .tooltip-content-wide {
-    visibility: visible;
-    opacity: 1;
+/* Arrow pointing up */
+.tooltip-content-wide::before {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    right: 14px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent transparent var(--border-color) transparent;
 }
+
+.tooltip-content-wide::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    right: 15px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent var(--bg-tertiary) transparent;
+}
+
+
+
+/* Scrollbar hidden via .section-timeline styles */
 
 @media (max-width: 768px) {
-    .schedule-container {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
     .day-column {
+        min-width: 280px;
+        flex: 0 0 280px;
         padding: 16px;
     }
 
     .timeline-item {
         padding: 12px;
         gap: 12px;
-    }
-
-    .timeline-content h4 {
-        font-size: 1rem;
-        max-width: 150px;
-    }
-
-    .tooltip-content-wide {
-        width: 200px;
-        right: auto;
-        left: 0;
-    }
-}
-
-@media (max-width: 480px) {
-    .timeline-item {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .timeline-time {
-        min-width: auto;
     }
 }
 
@@ -238,5 +387,31 @@
 
     50% {
         opacity: 1;
+    }
+}
+
+@keyframes pulse-badge {
+
+    0%,
+    100% {
+        box-shadow: 0 0 12px rgba(74, 222, 128, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+    }
+}
+
+@keyframes pulse-dot {
+
+    0%,
+    100% {
+        box-shadow: 0 0 8px #4ade80;
+        transform: scale(1);
+    }
+
+    50% {
+        box-shadow: 0 0 12px #4ade80;
+        transform: scale(1.1);
     }
 }

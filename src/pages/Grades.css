@@ -82,22 +82,49 @@
 }
 
 .v5-stat-card {
-    background: var(--bg-secondary);
+    background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 16px;
+    border-radius: 20px;
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.v5-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--primary);
+    opacity: 0.8;
+}
+
+.v5-stat-card:nth-child(2)::before {
+    background: var(--accent-blue);
+}
+
+.v5-stat-card:nth-child(3)::before {
+    background: var(--text-secondary);
+}
+
+.v5-stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
 }
 
 .v5-stat-label {
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.8px;
 }
 
 .v5-stat-value-group {
@@ -108,44 +135,48 @@
 
 .v5-stat-value {
     font-size: 2.5rem;
-    font-weight: 800;
-    color: var(--accent-blue);
+    font-weight: 900;
+    color: var(--text-primary);
 }
 
 .v5-stat-max {
     font-size: 1rem;
-    color: var(--text-secondary);
+    color: var(--text-tertiary);
     font-weight: 500;
 }
 
 /* Insight Card */
 .v5-insight-card {
-    background: rgba(59, 130, 246, 0.05);
-    border: 1px solid rgba(59, 130, 246, 0.1);
-    border-radius: 12px;
-    padding: 16px 20px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 20px 24px;
     display: flex;
     align-items: center;
     gap: 16px;
     margin-bottom: 40px;
+    box-shadow: var(--shadow-sm);
 }
 
 .v5-insight-icon-wrapper {
-    width: 40px;
-    height: 40px;
-    background: var(--accent-blue);
-    color: white;
-    border-radius: 10px;
+    width: 44px;
+    height: 44px;
+    background: var(--bg-card);
+    color: var(--primary);
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
+    font-size: 1.3rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
 }
 
 .v5-insight-text {
     font-size: 0.95rem;
-    color: var(--text-primary);
-    line-height: 1.5;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-weight: 500;
 }
 
 /* Course Grid */
@@ -156,19 +187,33 @@
 }
 
 .v5-course-card {
-    background: var(--bg-secondary);
+    background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 20px;
     padding: 24px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.v5-course-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--primary);
+    opacity: 0.8;
 }
 
 .v5-course-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
-    border-color: var(--accent-blue);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
 }
 
 .v5-course-header {
@@ -198,6 +243,9 @@
     padding: 2px 8px;
     border-radius: 6px;
     text-transform: uppercase;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
 }
 
 .v5-course-meta {
@@ -221,7 +269,7 @@
 .v5-grade-value {
     font-size: 1.5rem;
     font-weight: 800;
-    color: var(--accent-blue);
+    color: var(--primary);
 }
 
 .v5-course-stats-grid {
@@ -238,6 +286,7 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
+    border: 1px solid var(--border-color);
 }
 
 .v5-course-stat-label {
@@ -295,7 +344,8 @@
 }
 
 .v5-expand-btn:hover {
-    background: var(--border-color);
+    background: var(--bg-hover);
+    border-color: var(--text-secondary);
 }
 
 .v5-grades-list {
@@ -312,6 +362,7 @@
     padding: 12px;
     background: var(--bg-tertiary);
     border-radius: 10px;
+    border: 1px solid var(--border-color);
 }
 
 .v5-grade-info {
@@ -338,7 +389,7 @@
 
 .v5-grade-score {
     font-weight: 700;
-    color: var(--accent-blue);
+    color: var(--primary);
 }
 
 .v5-grade-actions {
@@ -357,28 +408,30 @@
 }
 
 .v5-action-btn:hover {
-    color: var(--accent-blue);
-    background: rgba(59, 130, 246, 0.1);
+    color: var(--primary);
+    background: var(--bg-hover);
 }
 
 .v5-action-btn.delete:hover {
-    color: var(--accent-red);
+    color: var(--danger);
     background: rgba(239, 68, 68, 0.1);
 }
 
 /* Form Card */
 .v5-form-card {
-    background: var(--bg-secondary);
+    background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 20px;
     padding: 32px;
     margin-bottom: 40px;
+    box-shadow: var(--shadow-sm);
 }
 
 .v5-form-card h3 {
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 24px;
+    color: var(--text-primary);
 }
 
 .v5-form-grid {
@@ -407,6 +460,13 @@
     padding: 12px;
     color: var(--text-primary);
     font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.v5-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: var(--bg-card);
 }
 
 .v5-form-actions {
@@ -416,19 +476,21 @@
 
 /* Buttons */
 .v5-btn-primary {
-    background: var(--accent-blue);
+    background: var(--primary);
     color: white;
     border: none;
     padding: 12px 24px;
     border-radius: 12px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
 .v5-btn-primary:hover {
-    background: #2563eb;
-    transform: translateY(-1px);
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
 }
 
 .v5-btn-secondary {
@@ -443,7 +505,8 @@
 }
 
 .v5-btn-secondary:hover {
-    background: var(--border-color);
+    background: var(--bg-hover);
+    border-color: var(--text-secondary);
 }
 
 .v5-btn-ghost {
@@ -453,6 +516,7 @@
     padding: 12px 24px;
     font-weight: 600;
     cursor: pointer;
+    transition: color 0.2s;
 }
 
 .v5-btn-ghost:hover {
@@ -463,7 +527,7 @@
 .v5-empty-page-state {
     text-align: center;
     padding: 80px 20px;
-    background: var(--bg-secondary);
+    background: var(--bg-tertiary);
     border-radius: 20px;
     border: 1px dashed var(--border-color);
 }
@@ -488,8 +552,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -498,13 +562,13 @@
 }
 
 .v5-modal-content {
-    background: var(--bg-secondary);
+    background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 24px;
     padding: 32px;
     width: 100%;
     max-width: 500px;
-    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--shadow-md);
     animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -519,6 +583,7 @@
     font-size: 1.5rem;
     font-weight: 700;
     margin: 0;
+    color: var(--text-primary);
 }
 
 .v5-close-btn {
@@ -529,6 +594,11 @@
     cursor: pointer;
     padding: 4px;
     line-height: 1;
+    transition: color 0.2s;
+}
+
+.v5-close-btn:hover {
+    color: var(--text-primary);
 }
 
 .v5-semester-list {
@@ -549,10 +619,12 @@
     background: var(--bg-tertiary);
     border-radius: 16px;
     transition: all 0.2s;
+    border: 1px solid transparent;
 }
 
 .v5-semester-item:hover {
-    background: var(--border-color);
+    background: var(--bg-hover);
+    border-color: var(--border-color);
 }
 
 .v5-semester-name {

@@ -30,8 +30,8 @@ const TaskInput = () => {
 
     if (!isOpen) {
         return (
-            <button className="btn btn-primary task-fab" onClick={() => setIsOpen(true)}>
-                <FaPlus /> Add Task
+            <button className="task-fab" aria-label="Add Task" onClick={() => setIsOpen(true)}>
+                <FaPlus />
             </button>
         );
     }

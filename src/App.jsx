@@ -10,10 +10,14 @@ import './App.css';
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const Courses = React.lazy(() => import('./pages/Courses'));
 const SmartSchedule = React.lazy(() => import('./pages/SmartSchedule'));
+const TimeTable = React.lazy(() => import('./pages/TimeTable'));
 const FocusMode = React.lazy(() => import('./pages/FocusMode'));
 const Grades = React.lazy(() => import('./pages/Grades'));
 const Attendance = React.lazy(() => import('./pages/Attendance'));
 const Settings = React.lazy(() => import('./pages/Settings'));
+const Profile = React.lazy(() => import('./pages/Profile'));
+const Calendar = React.lazy(() => import('./pages/Calendar'));
+const Notes = React.lazy(() => import('./pages/Notes'));
 
 // Loading Component
 const PageLoader = () => (
@@ -53,10 +57,14 @@ function App() {
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/courses" element={<Courses />} />
                 <Route path="/schedule" element={<SmartSchedule />} />
+                <Route path="/timetable" element={<TimeTable />} />
+                <Route path="/calendar" element={<Calendar />} />
+                <Route path="/notes" element={<Notes />} />
                 <Route path="/attendance" element={<Attendance />} />
                 <Route path="/grades" element={<Grades />} />
                 <Route path="/focus" element={<FocusMode />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/profile" element={<Profile />} />
               </Routes>
             </React.Suspense>
           ) : (
@@ -69,7 +77,7 @@ function App() {
           )}
         </main>
       </div>
-    </Router>
+    </Router >
   );
 }
 

@@ -131,6 +131,20 @@ const aiService = {
         }
     },
 
+    // 9. Health Check
+    checkHealth: async () => {
+        try {
+            const response = await fetch('http://localhost:5001/health');
+            if (response.ok) {
+                const data = await response.json();
+                return { status: 'online', details: data };
+            }
+            return { status: 'offline' };
+        } catch (error) {
+            return { status: 'offline' };
+        }
+    },
+
     // 8. Prioritize Tasks (Batch Prediction + Sorting)
     prioritizeTasks: async (tasks) => {
         try {
