@@ -116,3 +116,8 @@ AcadBox was built to address **real academic pain points**, especially attendanc
 
 ## 📄 License
 This project is open-source and available for educational use.
+
+
+## Contribution
+- Added minor improvements and setup fixes
+- Worked on project structure, optimization and testing
