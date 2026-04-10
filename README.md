@@ -1,82 +1,113 @@
-# 📦 AcadBox — Smart Academic Management System
+<div align="center">
+
+# AcadBox
+
+### Smart Academic Management System.
+
+<br>
+
+[![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Scikit-Learn](https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
+
+<br>
 
 AcadBox is an intelligent academic dashboard designed to help students **track performance, manage attendance risk, plan schedules, and stay focused** — all from a single platform.
 
-> 🚨 Most students don’t fail due to low grades — they fail due to **attendance shortages**.  
-> **AcadBox predicts academic and attendance risks *before* they become irreversible.**
+<br>
+
+> **Note:** Most academic failures stem from attendance shortages. AcadBox predicts academic and attendance risks prior to irreversible consequences.
 
 ---
 
-## 🚀 Key Features
+</div>
 
-### 🧠 AI-Powered Prioritization
-- **Smart Task Sorting:** Uses a Random Forest model to prioritize tasks based on deadline, effort, and course credits.
-- **Academic Health Engine:** Predicts your academic health status (Excellent, Strong, Critical) based on attendance, grades, and focus habits.
-- **Intelligent Insights:** Provides actionable advice like "Focus on Data Structures today to save your streak."
+<br>
 
-### 📊 Academic Performance Tracking
-- Cumulative CPI and semester-wise SPI
-- Course-level grade management
-- Clean academic overview dashboard
-- Semester-based performance tracking
+## Key Features
 
-### ⚠️ Attendance Risk Monitor (Core Feature 🔥)
-- Course-wise attendance percentage
-- Safe / At-Risk / Critical classification
-- Predictive insights such as:
-  - *“If you miss the next 2 classes, attendance will drop to 68%”*
-  - *“You can miss only 1 more class to stay above 80%”*
-- Built around the **80% minimum attendance rule**
+<table>
+<tr>
+<td width="50%">
 
-### 🗓 Smart Schedule
-- **AI-Optimized Plan:** Automatically buckets tasks into "Today" and "Tomorrow" based on urgency.
-- **Visual Feedback:** "AI Thinking" animations show when the system is processing your workload.
-- **Full Control:** Edit, delete, and manage tasks directly from the schedule.
+### AI-Powered Prioritization
+- **Smart Task Sorting**: Implements Random Forest models prioritizing task matrices based on impending deadlines, required effort, and course credits.
+- **Academic Health Engine**: Predicts overall academic health status (Excellent, Strong, Critical) by analyzing attendance maps, derived grades, and focusing habits.
+- **Intelligent Insights**: Yields actionable, continuous operational advice (e.g., "Shift focus to Data Structures today to maintain the active streak").
 
-### 🎯 Focus Mode
-- **Locked Sessions:** Commit to a task and lock the screen to prevent distractions.
-- **AI Task Selection:** Selects the most critical task for you to work on first.
-- **Session Autopsy:** Analyze your performance after each session.
+</td>
+<td width="50%">
 
----
+### Attendance Risk Monitor
+- **Course-Wise Tracking**: Validates active attendance percentages consistently.
+- **Threshold Classification**: Maps continuous safe, at-risk, and critical bounds metrics.
+- **Predictive Interpolation**: Yields insights highlighting threshold breaking points (e.g., remaining misses available prior to dropping below the 80% mark).
 
-## 🛠 Tech Stack
+</td>
+</tr>
+<tr>
+<td width="50%">
 
-- **Frontend:** React + Vite (Modern, Responsive UI)
-- **Backend:** Node.js + Express (API Gateway & Business Logic)
-- **AI Service:** Python + Flask + Scikit-Learn (Machine Learning Models)
-- **Data Persistence:** LocalStorage (Frontend) & In-Memory/JSON (Backend)
+### Academic Performance
+- Accumulates core CPI evaluations and semester-wise SPI performance.
+- Direct course-level grade management architecture.
+- Centralized comprehensive academic overview dashboard.
 
----
+</td>
+<td width="50%">
 
-## ⚙️ Setup & Installation
+### Intelligent Focus Control
+- **AI Task Selection**: Automatically queues primary critical tasks derived computationally.
+- **Locked Target Sessions**: Distraction-free focal operations.
+- **Session Autopsy**: Yields post-session analytical breakdowns covering time tracking metrics.
+
+</td>
+</tr>
+</table>
+
+<br>
+
+## Tech Stack
+
+| Layer | Architecture |
+|---|---|
+| **Frontend** | React + Vite (Modern Responsive User Interface) |
+| **Backend** | Node.js + Express (Operational API Gateway) |
+| **AI Service** | Python + Flask + Scikit-Learn (Predictive Machine Learning Modeling) |
+| **Data Persistence** | LocalStorage (Client Memory) combined with In-Memory JSON (Runtime Node.js Server) |
+
+<br>
+
+## Setup & Installation
 
 ### Prerequisites
 - Node.js (v16+)
 - Python (v3.8+)
 
-### 1. Clone the Repository
+### 1. Repository Configuration
 ```bash
-git clone <repository-url>
-cd acadbox
+git clone https://github.com/punitxdev/AcadBox.git
+cd AcadBox
 ```
 
-### 2. Setup Frontend
+### 2. Frontend Initialization
 ```bash
 npm install
 npm run dev
 ```
-*Runs on `http://localhost:5173`*
+> Operates locally via `http://localhost:5173`
 
-### 3. Setup Backend (Node.js)
+### 3. Backend Generation
 ```bash
 cd server
 npm install
 node index.js
 ```
-*Runs on `http://localhost:5000`*
+> API processes execute on `http://localhost:5000`
 
-### 4. Setup AI Service (Python)
+### 4. AI Service Mapping
 ```bash
 cd python_service
 python -m venv venv
@@ -84,40 +115,40 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 5. ⚠️ Generate AI Models (Required)
-The pre-trained models are too large for GitHub, so you must generate them locally before running the app.
+### 5. Generate Essential AI Models
+The pre-trained classification models necessitate localized programmatic generation sequences before activating the application stack.
 
-1.  Navigate to the `aiModels/` directory.
-2.  Open and run all cells in `TaskPriorityModel.ipynb` to generate `acadbox_task_priority_model.pkl`.
-3.  Open and run all cells in `AcademicHealthModel.ipynb` to generate `acadbox_academic_health_model.pkl`.
-4.  Ensure the generated `.pkl` files are in the `aiModels/` directory.
+1. Navigate toward the `aiModels/` system directory.
+2. Initialize and evaluate all integrated cells spanning `TaskPriorityModel.ipynb` yielding `acadbox_task_priority_model.pkl`.
+3. Evaluate execution mapping spanning `AcademicHealthModel.ipynb` resulting in `acadbox_academic_health_model.pkl`.
+4. Validate both generated `.pkl` binary objects exist securely within the `aiModels/` root block.
 
-### 6. Run AI Service
+### 6. Execute Python Target
 ```bash
 python app.py
 ```
-*Runs on `http://localhost:5001`*
+> Evaluates target logic locally on `http://localhost:5001`
 
----
+<br>
 
-## 🏃‍♂️ Running the Full App
-For the application to work correctly, **all three services must be running simultaneously**.
+## System Execution
 
-1. **Terminal 1:** `npm run dev` (Frontend)
-2. **Terminal 2:** `node server/index.js` (Backend)
-3. **Terminal 3:** `python python_service/app.py` (AI Service)
+For the centralized structure to execute effectively, **all integrated services must run simultaneously**.
 
----
+1. **Terminal 1**: `npm run dev` (Client Application)
+2. **Terminal 2**: `node server/index.js` (Server Routing)
+3. **Terminal 3**: `python python_service/app.py` (AI Analysis)
 
-## 🏆 Hackathon Note
-AcadBox was built to address **real academic pain points**, especially attendance-related failures, using **predictive and user-friendly design**. It integrates a real Machine Learning model to provide personalized study recommendations.
+<br>
 
----
+## Project Details
 
-## 📄 License
-This project is open-source and available for educational use.
+AcadBox solves foundational university metrics surrounding critical failure paths, heavily targeting attendance deviations leveraging systematic machine learning predictive structures generating highly tailored behavioral and study optimizations.
 
+<br>
 
-## Contribution
-- Added minor improvements and setup fixes
-- Worked on project structure, optimization and testing
+## Contribution and Licensing
+
+Available generally for overarching educational deployment and structural utilization. Contributions addressing algorithmic iteration processing are appreciated.
+
+<br>
